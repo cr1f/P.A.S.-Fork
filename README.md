@@ -4,7 +4,7 @@
 <br/>
   
 >For improvements, was chosen a ready-made and well-tested webshell with a GUI interface.
-**WSO2** is obsolete and requires significant improvements. **b374k** is too overloaded with unnecessary functionality. **P.A.S.** by with its structure and design, fit perfectly.
+**WSO2** is obsolete and requires significant improvements. **b374k** is too overloaded with unnecessary functionality. **P.A.S.** with its structure and design, fit perfectly.
 Although the author stopped supporting his product, I did not dare to release a modification with a further version number (the cobbler should stick to his last). Therefore, I offer my respect to @profexer and I hope that he will continue his wonderful work someday...
 
 <br/>
@@ -160,3 +160,6 @@ Screenshots
 **Dark mode:**
 
 ![dark mode](https://i.imgur.com/2mO7MLS.png)
+
+<br/><br/>
+Official thread on the forum: https://antichat.com/threads/474941/
