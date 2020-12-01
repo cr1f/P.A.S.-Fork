@@ -15,11 +15,12 @@ A modified version of the well-known webshell - P.A.S. by Profexer ([1](https://
 + Before using, it's better to remove all HttpOnly cookies for the domain
 ```
 
-<br/><br/>
+<br/>
 
 Features of the original **P.A.S.**:
 <details>
   <summary>Click to expand</summary>
+  
 ## **General**
 
 * Works on PHP >= 4.1.0
