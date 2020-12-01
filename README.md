@@ -133,7 +133,7 @@ Features of the original **P.A.S.**:
 - Obfuscation of response
 - Authorization by password
 - Authorization by HTTP header (user-agent by default)
-- Fix MySQL dump in PDO mode
+- MySQL dump fix in PDO mode
 - Renamed "PHP 4-style constructors"
 - Removed **pcntl_exec**
 - **opcache_invalidate** after saving the file
