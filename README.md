@@ -138,7 +138,7 @@ Features of the original **P.A.S.**:
 - Removed **pcntl_exec**
 - **opcache_invalidate** after saving the file
 - Dark color mode
-- Option to display **ctime**
+- Option to display **ctime** (to find malicious files)
 - Supported PHP versions: 5 >= 5.1.2, 7, 8 (*)
 
 <br/>
