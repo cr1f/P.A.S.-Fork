@@ -135,8 +135,8 @@ Features of the original **P.A.S.**:
 - Authorization by HTTP header (user-agent by default)
 - Fix MySQL dump in PDO mode
 - Renamed "PHP 4-style constructors"
-- Removed pcntl_exec
-- opcache_invalidate after saving the file
+- Removed **pcntl_exec**
+- **opcache_invalidate** after saving the file
 - Dark color mode
 - Option to display **ctime**
 - Supported PHP versions: 5 >= 5.1.2, 7, 8 (*)
