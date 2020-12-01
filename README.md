@@ -120,7 +120,7 @@ Features of the original **P.A.S.**:
 * Type **cls** or **clear** or press **CTRL+L** to clear output
 </details>
 
-<br/><br/>
+<br/>
 
 **P.A.S. Fork** changes:
 
