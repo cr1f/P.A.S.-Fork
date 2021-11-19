@@ -4,7 +4,7 @@ list($p, $a, $c, $k, $e, $r) = x();
 switch($k){
 	case 'ZIP':
 	case 'PHAR':
-		$e = s().j().j().($k == 'ZIP' ? "ob_".r('end_','')."clean".j()."(".j().")".j().r('.',';') : '').j().r('exit', 'die', '').j()."(".j().r('include','require').r('_once','').j()."~".j().(d() ? r('raw', '').'urldecode' : 'hex2bin').j()."(".j().(d() ? '\'%\'.' : '').j().u('php://filter/string.rot13|convert.base64-decode|zlib.inflate/resource=phar://').j().")".j().".".j()."__FILE__".j().".".j()."'/'".j().".".j()."~".j()."'".~(addslashes(f(__DIR__)))."'".j().")".j().";".j();
+		$e = t(s().j().($k == 'ZIP' ? 'ob_'.r('end_','').'clean()'.r('.',';') : '').r('exit', 'die', '').'('.r('include','require').r('_once','').'~'.(d() ? r('raw', '').'urldecode' : 'hex2bin').'('.(d() ? '\'%\'.' : '').u('php://filter/string.rot13|convert.base64-decode|zlib.inflate/resource=phar://').').__FILE__."/".~"'.~(addslashes(f(__DIR__))).'");');
 		$r = str_rot13(chunk_split(base64_encode(gzdeflate(s().'?>'.file_get_contents($c), 9)), rand(1, 100) * 4));
 
 		switch($k){
@@ -25,8 +25,9 @@ switch($k){
 	break;
 
 	default:
-		foreach(array("array_map", "strrev", "gzuncompress", "base64_decode", "create_function") as $fn) @$ps .= (int)$i++."=%".implode("%", str_split(bin2hex($fn), 2))."&";
-		file_put_contents($c.$p, s().j()."parse_str".j()."(".j().implode(".", array_map(function($k){return j()."'".$k."'".j();}, str_split($ps, rand(1,4)))).j().",".j()."\$$r".j().")".j().";".j().($e ? "@".j()."eval".j()."(" : "@".j()."\$$r".j()."[".j()."0".j()."]".j()."(".j()."\$$r".j()."[".j()."4".j()."]".j().",".j()."array".j()."(".j().")".j().",".j()."array".j()."(".j()."'};'".j().".").j()."\$$r".j()."[".j()."2".j()."]".j()."(".j()."\$$r".j()."[".j()."3".j()."]".j()."(".j()."\$$r".j()."[".j()."1".j()."]".j()."(".j()."'".strrev(base64_encode(gzcompress("?>".s()."?>".file_get_contents($c))))."'".j().")".j().($e ? "" : ")").j().")".j().".".j()."'//'".j().")".j().")".j().";".j());
+		foreach(array('array_map', 'strrev', 'gzuncompress', 'base64_decode', 'create_function') as $fn) @$ps .= (int)$i++.'=%'.implode('%', str_split(bin2hex($fn), 2)).'&';
+		
+		file_put_contents($c.$p, t(s().'parse_str('.implode('.', array_map(function($k){return '"'.$k.'"';}, str_split($ps, rand(1,4)))).',$'.$r.');@'.($e ? 'eval(' : '$'.$r.'[0]($'.$r.'[4],array(),array'.'("};".').'$'.$r.'[2]($'.$r.'[3]($'.$r.'[1]("'.strrev(base64_encode(gzcompress('?>'.s().'?>'.file_get_contents($c)))).'")'.($e ? '' : ')').')."//"));'));
 }
 
 m($k.' Ok');
@@ -57,7 +58,7 @@ function m($s){
 }
 
 function s(){
-	return '<?'.r('='.r(j(),'').r('\'\'','""','false', 'null', '@'.j().'$'.substr(md5(microtime()), 0, rand(1, 32))).r('',j()).';'.r('',j()),'php'.w());
+	return '<?'.r('='.r('\'\'','""','false', 'null', '@$'.str_repeat(chr(rand(65, 90)), rand(1, 3))).';'.r('',j()),'php'.w());
 }
 
 function d(){
@@ -65,7 +66,7 @@ function d(){
 }
 
 function w(){
-	return implode('', array_rand(array_flip(["\n","\r","\t",' ', '', chr(9)]), rand(2, 5))).r(j(),'');
+	return implode('', array_rand(array_flip(["\n","\r","\t"," ", "", chr(9)]), rand(2, 5))).r(j(),'');
 }
 
 function j(){
@@ -78,10 +79,16 @@ function j(){
 		return (rand(0, 1) ? "/*".str_replace("*/","", $c)."*/" : (rand(0, 1) ? "\t".j() : " ".j()));
 }
 
+function t($s){
+	foreach(token_get_all($s) as $t)
+		@$r .= (is_array($t) ? $t[1] : $t).j();
+	return $r;
+}
+
 function u($s){
 	return implode('.', array_map(
 		function($k){
-				return j().'\''.$k.'\''.j();
+				return '\''.$k.'\'';
 		}, str_split(implode((d() ? '%' : ''), str_split(bin2hex(~$s), 2)), rand(1,4)))
 	);
 }
