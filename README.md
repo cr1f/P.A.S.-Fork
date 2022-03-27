@@ -125,7 +125,7 @@ Features of the original **P.A.S.**:
 <br/>
 
 **P.A.S. Fork** changes:
-
+  
 - Work via GET requests (parameters in cookies)
 - Automatic switching to POST (with cancellation)
 - Obfuscation of query keys and values
@@ -139,8 +139,11 @@ Features of the original **P.A.S.**:
 - **opcache_invalidate** after saving the file
 - Dark color mode
 - Option to display **ctime** (to find malicious files)
-- Supported PHP versions: 5 >= 5.1.2, 7, 8 (*)
-
+- Option to invert terminal output
+- Removed startup "execs" check
+- FileManager JS crash fix (on rare envs)
+- Supported PHP versions: 5 >= 5.1.2, 7, 8
+  
 <br/>
 
 Screenshots
