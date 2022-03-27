@@ -26,7 +26,6 @@ switch($k){
 
 	default:
 		foreach(array('array_map', 'strrev', 'gzuncompress', 'base64_decode', 'create_function') as $fn) @$ps .= (int)$i++.'=%'.implode('%', str_split(bin2hex($fn), 2)).'&';
-		
 		file_put_contents($c.$p, t(s().'parse_str('.implode('.', array_map(function($k){return '"'.$k.'"';}, str_split($ps, rand(1,4)))).',$'.$r.');@'.($e ? 'eval(' : '$'.$r.'[0]($'.$r.'[4],array(),array'.'("};".').'$'.$r.'[2]($'.$r.'[3]($'.$r.'[1]("'.strrev(base64_encode(gzcompress('?>'.s().'?>'.file_get_contents($c)))).'")'.($e ? '' : ')').')."//"));'));
 }
 
@@ -34,10 +33,14 @@ m($k.' Ok');
 
 function x(){
 	$r = chr(rand(97, 122));
-	$a = (class_exists('ZipArchive') ? new ZipArchive : false);
-	(!isset($_SERVER['argv'][1]) ? m($a ? 'php '.basename(__FILE__).' file_to_pack.php [ASCII|PHAR|ZIP] [PHP8]' : 'php-zip extension required!') : @list($x, $c, $k, $e) = $_SERVER['argv']);
+	@list($x, $c, $k, $e) = $_SERVER['argv'];
 	$p = '_packed.php'.($k == 'PHAR' ? '.phar' : '');
-	(file_exists($c) ? @unlink($c.$p) : m('`'.$c.'` not exists'));
+	$a = (class_exists('ZipArchive') ? new ZipArchive : false);
+	
+	($k !== 'ASCII' && ini_get('phar.readonly') ? m('PHAR creation is disabled in "'.php_ini_loaded_file().'", need "phar.readonly = Off"') :
+	(empty($c) ? m($a ? 'php '.basename(__FILE__).' file_to_pack.php [ASCII|PHAR|ZIP] [PHP8]' : 'php-zip extension required!') :
+	(file_exists($c) ? @unlink($c.$p) : m('`'.$c.'` not exists'))));
+	
 	return [$p, $a, $c, $k, $e, $r];
 }
 
