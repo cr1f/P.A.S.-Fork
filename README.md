@@ -140,7 +140,7 @@ Features of the original **P.A.S.**:
 - Dark color mode
 - Option to display **ctime** (to find malicious files)
 - Option to invert terminal output
-- Removed startup "execs" check
+- Removed startup "execs"
 - FileManager JS crash fix (on rare envs)
 - Supported PHP versions: 5 >= 5.1.2, 7, 8
   
