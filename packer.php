@@ -4,8 +4,8 @@ list($p, $a, $c, $k, $e, $r) = x();
 switch($k){
 	case 'ZIP':
 	case 'PHAR':
-		$e = t(s().j().($k == 'ZIP' ? 'ob_'.r('end_','').'clean()'.r('.',';') : '').r('exit', 'die', '').'('.r('include','require').r('_once','').'~'.(d() ? r('raw', '').'urldecode' : 'hex2bin').'('.(d() ? '\'%\'.' : '').u('php://filter/string.rot13|convert.base64-decode|zlib.inflate/resource=phar://').').__FILE__."/".~"'.~(addslashes(f(__DIR__))).'");');
-		$r = str_rot13(chunk_split(base64_encode(gzdeflate(s().'?>'.file_get_contents($c), 9)), rand(1, 100) * 4));
+		$e = t(s().j().($k == 'ZIP' ? c('ob_').r('end_','').c('clean()').r('.',';') : '').r('exit', 'die', '').'('.r('include','require').r('_once','').'~'.c(d() ? r('raw', '').'urldecode' : 'hex2bin').'('.(d() ? '\'%\'.' : '').u('php://filter/string.rot13|convert.base64-decode|zlib.inflate/resource=phar://').').'.c('__FILE__').'."/".~"'.~(addslashes(f(__DIR__))).'");');
+		$r = str_rot13(chunk_split(base64_encode(gzdeflate(s().'?>'.e($c), 9)), rand(1, 100) * 4));
 
 		switch($k){
 			case 'ZIP': # The output isn't always valid for PHP5/7 (some php-zip bug), try to pack several times
@@ -25,8 +25,8 @@ switch($k){
 	break;
 
 	default:
-		foreach(array('array_map', 'strrev', 'gzuncompress', 'base64_decode', 'create_function') as $fn) @$ps .= (int)$i++.'=%'.implode('%', str_split(bin2hex($fn), 2)).'&';
-		file_put_contents($c.$p, t(s().'parse_str('.implode('.', array_map(function($k){return '"'.$k.'"';}, str_split($ps, rand(1,4)))).',$'.$r.');@'.($e ? 'eval(' : '$'.$r.'[0]($'.$r.'[4],array(),array'.'("};".').'$'.$r.'[2]($'.$r.'[3]($'.$r.'[1]("'.strrev(base64_encode(gzcompress('?>'.s().'?>'.file_get_contents($c)))).'")'.($e ? '' : ')').')."//"));'));
+		foreach(c(array('array_map', 'strrev', 'gzuncompress', 'base64_decode', 'create_function')) as $fn) @$ps .= (int)$i++.'=%'.implode('%', str_split(bin2hex($fn), 2)).'&';
+		file_put_contents($c.$p, t(s().c('parse_str(').implode('.', array_map(function($k){return '"'.$k.'"';}, str_split($ps, rand(1,4)))).',$'.$r.');@'.($e ? c('eval(') : '$'.$r.'[0]($'.$r.c('[4],array(),array').'("};".').'$'.$r.'[2]($'.$r.'[3]($'.$r.'[1]("'.strrev(base64_encode(gzcompress('?>'.s().'?>'.e($c)))).'")'.($e ? '' : ')').')."//"));'));
 }
 
 m($k.' Ok');
@@ -53,7 +53,7 @@ function f($s = 0){
 
 function r(){
 	$r = func_get_args();
-	return $r[rand(0, (func_num_args() - 1))];
+	return c($r[rand(0, (func_num_args() - 1))]);
 }
 
 function m($s){
@@ -94,4 +94,18 @@ function u($s){
 				return '\''.$k.'\'';
 		}, str_split(implode((d() ? '%' : ''), str_split(bin2hex(~$s), 2)), rand(1,4)))
 	);
+}
+
+function e($c){
+	return trim(file_get_contents($c), "?>\n\r\t ");
+}
+
+function c($o){
+	if(is_array($o))
+		foreach($o as $k => &$v) $v = c($v);
+	
+	if(is_string($o))
+		$o = implode('', array_map(function($s){return rand(0, 1) ? strtolower($s) : strtoupper($s);}, str_split($o)));
+	
+	return $o;
 }
