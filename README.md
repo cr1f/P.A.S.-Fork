@@ -163,6 +163,21 @@ Screenshots
 **Dark mode:**
 
 ![dark mode](https://i.imgur.com/2mO7MLS.png)
+  
+<br/>
 
-<br/><br/>
-Official thread on the forum: https://antichat.com/threads/474941/
+Packer modes
+============
+
+* **ASCII** // `create_function`, PHP5/7 only
+* **ASCII PHP8** // `eval`
+* **PHAR** // `include` + phar:// + PHAR container
+* **ZIP** // `include` + phar:// + ZIP container
+
+<br/>
+
+Links
+=====
+
+* Official thread on the forum: https://antichat.com/threads/474941/
+* Review from Sucury: https://blog.sucuri.net/2020/10/p-a-s-fork-v-1-0-a-web-shell-revival.html
