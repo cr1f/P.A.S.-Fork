@@ -180,4 +180,4 @@ Links
 =====
 
 * Official thread on the forum: https://antichat.com/threads/474941/
-* Review from Sucury: https://blog.sucuri.net/2020/10/p-a-s-fork-v-1-0-a-web-shell-revival.html
+* Review from Sucuri: https://blog.sucuri.net/2020/10/p-a-s-fork-v-1-0-a-web-shell-revival.html
