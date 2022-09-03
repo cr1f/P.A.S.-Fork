@@ -196,7 +196,7 @@ Packer modes
 * **PHAR** // `include` + phar:// + PHAR container
 * **ZIP** // `include` + phar:// + ZIP container ( *the output isn't always valid for PHP5/7, try to pack several times* )
 
-The **php-zip** extension is not required for the packaged script to work on another host.
+The **php-zip** extension is not required for the packaged script to work on target host.
 
 <br/>
 
