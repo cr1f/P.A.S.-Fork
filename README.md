@@ -10,7 +10,7 @@ Although the author stopped supporting his product, I did not dare to release a 
 <br/>
 </details>
 
-A modified version of the well-known webshell - P.A.S. by Profexer ([1](https://github.com/winstrool/pas-4.1.1b_source_code), [2](https://github.com/wordfence/grizzly/tree/master/pas-4.1.1b)). Tries to solve the problem of detecting some requests and responses by various **Web Application Firewalls** and **Intrusion Detection Systems**. In most cases, such detections entail retaliatory measures from the attacked side, which is not always permissible during penetration tests and in red teaming.
+A modified version of the well-known webshell - P.A.S. by Profexer ([0](https://krebsonsecurity.com/2017/08/blowing-the-whistle-on-bad-attribution/), [1](https://github.com/winstrool/pas-4.1.1b_source_code), [2](https://github.com/wordfence/grizzly/tree/master/pas-4.1.1b)). Tries to solve the problem of detecting some requests and responses by various **Web Application Firewalls** and **Intrusion Detection Systems**. In most cases, such detections entail retaliatory measures from the attacked side, which is not always permissible during penetration tests and in red teaming.
 
 ```diff
 - This tool is for educational and testing purposes only and is not intended to be put into practise unless you have authorized access to the system
@@ -166,13 +166,37 @@ Screenshots
   
 <br/>
 
+Troubleshooting
+===============
+**The script doesn't work and keeps returning the same response.**
+* Perhaps caching of GET requests is enabled on the server. The solution is to turn off params passing via cookies and use POST requests (`$GLOBALS['COOKIE'] = false;`).
+
+**The randomly repeated password prompts.**
+* Most likely, your IP address changes with the same frequency. If so, then you need to change `$GLOBALS['REMOTE_ADDR']` to `false`.
+
+**Large files not downloading.**
+* The file wrapping operation happens on the fly, so a lot of RAM is required. The solution is to disable obfuscation by checking the `Skip response encoding` option in script GUI settings.
+
+**How set an authorization by the header?**
+* `$GLOBALS['SECHEAD'] = 'SECRET_9CA2100C44E50D81BB7E3EED84AF43F4';` and append it for each request in your browser (`Secret-9ca2100c44e50d81bb7e3eed84af43f4: foobar`). Without password asking - `$GLOBALS['PASSHASH'] = '';`
+
+**Switching the color theme is annoying.**
+* `$GLOBALS['DARK'] = true;`
+
+**Not working when the `X-Frame-Options: DENY` header is forcibly set.**
+* The solution is in the process of implementation.
+
+<br/>
+
 Packer modes
 ============
 
 * **ASCII** // `create_function`, PHP5/7 only
 * **ASCII PHP8** // `eval`
 * **PHAR** // `include` + phar:// + PHAR container
-* **ZIP** // `include` + phar:// + ZIP container
+* **ZIP** // `include` + phar:// + ZIP container ( *the output isn't always valid for PHP5/7, try to pack several times* )
+
+The **php-zip** extension is not required for the packaged script to work on another host.
 
 <br/>
 
