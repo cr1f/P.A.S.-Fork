@@ -4,51 +4,53 @@ list($p, $a, $c, $k, $e, $r) = x();
 switch($k){
 	case 'ZIP':
 	case 'PHAR':
-		$e = t(s().j().($k == 'ZIP' ? c('ob_').r('end_','').c('clean()').r('.',';') : '').r('exit', 'die', '').'('.r('include','require').r('_once','').'~'.c(d() ? r('raw', '').'urldecode' : 'hex2bin').'('.(d() ? '\'%\'.' : '').u('php://filter/string.rot13|convert.base64-decode|zlib.inflate/resource=phar://').').'.c('__FILE__').'."/".~"'.~(addslashes(f(__DIR__))).'");');
-		$r = str_rot13(chunk_split(base64_encode(gzdeflate(s().'?>'.e($c), 9)), rand(1, 100) * 4));
+		$x = t(c(s().j().($k == 'ZIP' ? 'ob_'.r('end_','').'clean()'.r('.',';') : '').r('exit', 'die', '').'('.r('include','require').r('_once','').'~'.d(r('raw', '').'urldecode','hex2bin').'('.(d('\'%\'.')).u('php://filter/string.rot13|convert.base64-decode|zlib.inflate/resource=phar://').').'.'__FILE__'.'."/".~"').~f().'");');
 
 		switch($k){
-			case 'ZIP': # The output isn't always valid for PHP5/7 (some php-zip bug), try to pack several times
-				$a->open($c.$p, ZipArchive::CREATE);
-				$a->addFromString(f(), j().$e.'?>');
-				$a->addFromString(f(__DIR__), $r);
-				$a->setCompressionIndex(0, ZipArchive::CM_STORE);
-				$a->close();
+			case 'ZIP':  # The DEFLATE output isn't always valid for PHP5/7 (some php-zip bug), try to pack several times
+					$a->open($c.$p, ZipArchive::CREATE);
+					$a->addFromString(f(0), j().$x.'?>');
+					$a->addFromString(f(), $r);
+					$a->setCompressionIndex(0, ZipArchive::CM_STORE);
+					$a->setCompressionIndex(1, ($e ? ZipArchive::CM_DEFLATE : ZipArchive::CM_STORE));
+					$a->close();
 			break;
 
 			default:
 				$a = new Phar($c.$p);
-				$a->setStub($e.'__HALT_COMPILER();');
-				$a[f(__DIR__)] = $r;
+				$a->setStub($x.'__HALT_COMPILER();');
+				$a[f()] = $r;
+				if($e) $a->compressFiles(Phar::GZ);
 				rename($c.$p, substr($c.$p, 0, (strlen($c.$p) - 5)));
 		}
 	break;
 
 	default:
-		foreach(c(array('array_map', 'strrev', 'gzuncompress', 'base64_decode', 'create_function')) as $fn) @$ps .= (int)$i++.'=%'.implode('%', str_split(bin2hex($fn), 2)).'&';
-		file_put_contents($c.$p, t(s().c('parse_str(').implode('.', array_map(function($k){return '"'.$k.'"';}, str_split($ps, rand(1,4)))).',$'.$r.');@'.($e ? c('eval(') : '$'.$r.'[0]($'.$r.c('[4],array(),array').'("};".').'$'.$r.'[2]($'.$r.'[3]($'.$r.'[1]("'.strrev(base64_encode(gzcompress('?>'.s().'?>'.e($c)))).'")'.($e ? '' : ')').')."//"));'));
+		foreach(c(['array_map', 'strrev', 'gzinflate', 'base64_decode', 'create_function', 'str_rot13']) as $fn) @$ps .= (int)$i++.'=%'.implode('%', str_split(bin2hex($fn), 2)).'&';
+		file_put_contents($c.$p, t(c(s().'parse_str('.implode('.', array_map(function($k){return '"'.$k.'"';}, str_split($ps, rand(1,4))))).',$'.$a.');@'.(!$e ? c('eval(') : '$'.$a.'[0]($'.$a.c('[4],array(),array').'("};".').'$'.$a.'[2]($'.$a.'[3]($'.$a.'[5]($'.$a.'[1]("'.strrev(d(chunk_split($r, rand(200, 250), '"."'), $r)).'"))'.(!$e ? '' : ')').')'.(!$e ? '' : '."//"').'));'));
 }
 
-m($k.' Ok');
+m($k.($e ? ' '.$e : '').' Ok');
+
 
 function x(){
-	$r = chr(rand(97, 122));
 	@list($x, $c, $k, $e) = $_SERVER['argv'];
 	$p = '_packed.php'.($k == 'PHAR' ? '.phar' : '');
-	$a = (class_exists('ZipArchive') ? new ZipArchive : false);
+	$a = ($k == 'ZIP' && class_exists('ZipArchive') ? new ZipArchive : f(0,0));
 	
-	($k !== 'ASCII' && ini_get('phar.readonly') ? m('PHAR creation is disabled in "'.php_ini_loaded_file().'", need "phar.readonly = Off"') :
-	(empty($c) ? m($a ? 'php '.basename(__FILE__).' file_to_pack.php [ASCII|PHAR|ZIP] [PHP8]' : 'php-zip extension required!') :
-	(file_exists($c) ? @unlink($c.$p) : m('`'.$c.'` not exists'))));
+	($k != 'ASCII' && ini_get('phar.readonly') ? m('PHAR creation is disabled in "'.php_ini_loaded_file().'", need "phar.readonly = Off"') :
+	(empty($c) ? m(is_object($a) ? 'php '.basename(__FILE__).' file_to_pack.php [ASCII|PHAR|ZIP] [CM|CF]' : 'php-zip extension required!') :
+	(file_exists($c) ? @unlink($c.$p) : m('`'.$c.'` file not exists'))));
+	$r = str_rot13(chunk_split(base64_encode(gzdeflate(($k == 'ASCII' ? j().'?>' : '').d(s(), t(s())).'?>'.e($c), rand(5, 9))), rand(100, 250) * 4));
 	
 	return [$p, $a, $c, $k, $e, $r];
 }
 
-function f($s = 0){
+function f($s = __DIR__, $e = 1){
 	$s = strval(filemtime($s ? $s : sys_get_temp_dir()));
 	$p = ($s[9] + 1);
 	$s = strtolower(strrev(str_replace(['/', '+', '='], '', base64_encode(md5($s)))));
-	return substr(substr($s, $p).'.'.substr($s, 0, $p), $p);
+	return substr(substr($s, $p).($e ? '.'.substr($s, 0, $p) : ''), $p);
 }
 
 function r(){
@@ -61,11 +63,12 @@ function m($s){
 }
 
 function s(){
-	return '<?'.r('='.r('\'\'','""','false', 'null', '@$'.str_repeat(chr(rand(65, 90)), rand(1, 3))).';'.r('',j()),'php'.w());
+	return '<?'.r('='.d('(').r('\'\'', '""', 'false', 'null', '@$'.f(0, 0)).d(')').';','php'.w());
 }
 
-function d(){
-	return date('s') > 30;
+function d($x, $z = ''){
+	$d = strval(getmypid() - date('s'));
+	return $d[strlen($d) - 1] >= 4 ? $x : $z;
 }
 
 function w(){
@@ -77,9 +80,9 @@ function j(){
 	while(!isset($c[$l])) @$c .= chr(rand(32, 126));
 	
 	if(rand(0, 1))
-		return (rand(0, 1) ? "#".chr(rand(32, 90)) : "//").str_replace("?>", "", $c).(rand(0, 1) ? "\r" : "\n");
+		return preg_replace("|\?>|", "", ((rand(0, 1) ? "#".chr(rand(32, 90)) : "//").$c.(rand(0, 1) ? "\r" : "\n")));
 	else
-		return (rand(0, 1) ? "/*".str_replace("*/","", $c)."*/" : (rand(0, 1) ? "\t".j() : " ".j()));
+		return (rand(0, 1) ? "/*".preg_replace("|\*/|","", $c)."*/" : (rand(0, 1) ? "\t".j() : " ".j()));
 }
 
 function t($s){
@@ -92,7 +95,7 @@ function u($s){
 	return implode('.', array_map(
 		function($k){
 				return '\''.$k.'\'';
-		}, str_split(implode((d() ? '%' : ''), str_split(bin2hex(~$s), 2)), rand(1,4)))
+		}, str_split(implode(d('%'), str_split(bin2hex(~$s), 2)), rand(1,4)))
 	);
 }
 
