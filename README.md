@@ -1,4 +1,4 @@
-# P.A.S. Fork v. 1.0
+# P.A.S. Fork v. 1.1
 <details>
   <summary>Preamble</summary>
 <br/>
@@ -136,12 +136,20 @@ Features of the original **P.A.S.**:
 - MySQL dump fix in PDO mode
 - Renamed "PHP 4-style constructors"
 - Removed **pcntl_exec**
+- New initialization logic (ini_*)
 - **opcache_invalidate** after saving the file
 - Dark color mode
+- Built-in Ace code editor (loaded on demand)
+- Added file extensions in filenames
 - Option to display **ctime** (to find malicious files)
 - Option to invert terminal output
 - Removed startup "execs"
 - FileManager JS crash fix (on rare envs)
+- Reload file bug fix
+- XHR instead IFRAME communication by default
+- The client referrer is not sent
+- Removed **X-Content-Type-Options** header in responses
+- **Clear output** in **PHP Console** checked by default
 - Supported PHP versions: 5 >= 5.1.2, 7, 8
   
 <br/>
@@ -163,6 +171,10 @@ Screenshots
 **Dark mode:**
 
 ![dark mode](https://i.imgur.com/2mO7MLS.png)
+
+**Code Editor:**
+  
+![dark mode](https://i.imgur.com/gAZkFMT.png)
   
 <br/>
 
@@ -183,18 +195,24 @@ Troubleshooting
 **Switching the color theme is annoying.**
 * `$GLOBALS['DARK'] = true;`
 
-**Not working when the `X-Frame-Options: DENY` header is forcibly set.**
-* The solution is in the process of implementation.
-
+**How to configure the code editor?**
+* You can place the editor [source code](https://github.com/ajaxorg/ace) on your host and specify `URL`. `MODE` and `THEME` is used to set default values during editor initialization. To exclude the editor completely, set the `$GLOBALS['ACECONF']` variable to `array()`;
 <br/>
 
-Packer modes
+Packer
 ============
+**Usage:**
 
-* **ASCII** // `create_function`, PHP5/7 only
-* **ASCII PHP8** // `eval`
+* `php packer.php pas_fork.php PHAR CM`
+  
+**Modes:**
+
+* **ASCII** // `eval` 
+* **ASCII CF** // `create_function`, PHP5/7 only
 * **PHAR** // `include` + phar:// + PHAR container
-* **ZIP** // `include` + phar:// + ZIP container ( *the output isn't always valid for PHP5/7, try to pack several times* )
+* **PHAR CM** // the same compressed
+* **ZIP** // `include` + phar:// + ZIP container
+* **ZIP CM** // the same compressed ( *the output isn't always valid for PHP5/7, try to pack several times* )
 
 The **php-zip** extension is not required for the packaged script to work on target host.
 
