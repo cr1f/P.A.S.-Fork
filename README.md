@@ -196,7 +196,7 @@ Troubleshooting
 * `$GLOBALS['DARK'] = true;`
 
 **How to configure the code editor?**
-* You can place the editor [source code](https://github.com/ajaxorg/ace) on your host and specify `URL`. `MODE` and `THEME` is used to set default values during editor initialization. To exclude the editor completely, set the `$GLOBALS['ACECONF']` variable to `array()`;
+* You can place the editor [source code](https://github.com/ajaxorg/ace) on your host and specify `URL`. `MODE` and `THEME` is used to set default values during editor initialization. To exclude the editor completely, set the `$GLOBALS['ACECONF']` variable to `array()`
 <br/>
 
 Packer
