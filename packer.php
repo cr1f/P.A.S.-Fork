@@ -72,7 +72,7 @@ function d($x, $z = ''){
 }
 
 function w(){
-	return implode('', array_rand(array_flip(["\n","\r","\t"," ", "", chr(9)]), rand(2, 5))).r(j(),'');
+	return implode('', array_rand(array_flip(["\n","\r","\t"," ", "", chr(9)]), rand(2, 5))).r(j(), '');
 }
 
 function j(){
