@@ -7030,7 +7030,7 @@ function aceEditorProcess(element){
 	    Object.defineProperty(textArea, 'value', {
 			set(value){
 				this.setterRedefined = true;
-				if(aceEditorDiv)
+				if(aceEditor[eId])
 					aceEditor[eId].setValue(value, -1);
 				return Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(this, value);
 			},
