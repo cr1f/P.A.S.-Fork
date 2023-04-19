@@ -1,4 +1,4 @@
-# P.A.S. Fork v. 1.1
+# P.A.S. Fork v. 1.2
 <details>
   <summary>Preamble</summary>
 <br/>
@@ -150,6 +150,14 @@ Features of the original **P.A.S.**:
 - The client referrer is not sent
 - Removed **X-Content-Type-Options** header in responses
 - **Clear output** in **PHP Console** checked by default
+- Option to set default tab on startup
+- Built-in [safemode](https://github.com/cr1f/safemode/) script
+- File sorting (Name, Ext, Size, etc)
+- Sort by filename by default
+- Reading **.gz** files (not saving)
+- **Show as HTML** fix in **PHP Console**
+- Maximize file editor window on double click
+- Removed **expect** from exec's
 - Supported PHP versions: 5 >= 5.1.2, 7, 8
   
 <br/>
@@ -189,6 +197,9 @@ Troubleshooting
 **Large files not downloading.**
 * The file wrapping operation happens on the fly, so a lot of RAM is required. The solution is to disable obfuscation by checking the `Skip response encoding` option in script GUI settings.
 
+**How to remove the warning about the limit of request?**
+* You should disable data transmission via cookies in the GUI (`Use cookie to request`). Or thus: `$GLOBALS['COOKIE'] = false;`.
+
 **How set an authorization by the header?**
 * `$GLOBALS['SECHEAD'] = 'SECRET_9CA2100C44E50D81BB7E3EED84AF43F4';` and append it for each request in your browser (`Secret-9ca2100c44e50d81bb7e3eed84af43f4: foobar`). Without password asking - `$GLOBALS['PASSHASH'] = '';`
 
@@ -196,7 +207,19 @@ Troubleshooting
 * `$GLOBALS['DARK'] = true;`
 
 **How to configure the code editor?**
-* You can place the editor [source code](https://github.com/ajaxorg/ace) on your host and specify `URL`. `MODE` and `THEME` is used to set default values during editor initialization. To exclude the editor completely, set the `$GLOBALS['ACECONF']` variable to `array()`
+* You can place the editor [source code](https://github.com/ajaxorg/ace) on your host and specify `URL`. `MODE` and `THEME` is used to set default values during editor initialization. To exclude the editor completely, set the `$GLOBALS['ACECONF']` variable to `array()`. Set `DEFAULT` to `true` if you want to load the editor automatically.
+
+**UI elements are too small.**
+* **Ctrl** and **+** for zoom / **Ctrl** and **-** for zoom out / **Ctrl** + **0** for reset
+
+**How to remove the password prompt?**
+* `$GLOBALS['PASSHASH'] = '';`
+
+**How to change the default tab?**
+* You have 5 options: `tabFM`, `tabSQL`, `tabPHP`, `tabTrm`, `tabInf`. For example: `$GLOBALS['DEFAULT_TAB'] = 'tabFM';`, to start script from the **File Manager** tab. 
+
+**`Send as` and `Load as` encodings don't work.**
+* Currently, for functionality, you should disable request and response obfuscation in the GUI.
 <br/>
 
 Packer
