@@ -27,7 +27,7 @@ switch($k){
 
 	default:
 		foreach(c(['array_map', 'strrev', 'gzinflate', 'base64_decode', 'create_function', 'str_rot13']) as $fn) @$ps .= (int)$i++.'=%'.implode('%', str_split(bin2hex($fn), 2)).'&';
-		file_put_contents($c.$p, t(c(s().'parse_str('.implode('.', array_map(function($k){return '"'.$k.'"';}, str_split($ps, rand(1,4))))).',$'.$a.');@'.(!$e ? c('eval(') : '$'.$a.'[0]($'.$a.c('[4],array(),array').'("};".').'$'.$a.'[2]($'.$a.'[3]($'.$a.'[5]($'.$a.'[1]("'.strrev(d(chunk_split($r, rand(200, 250), '"."'), $r)).'"))'.(!$e ? '' : ')').')'.(!$e ? '' : '."//"').'));'));
+		file_put_contents($c.$p, t(c(s().'parse_str('.implode('.', array_map(function($k){$r = rand(0,1); return ($r ? '"' : '\'').$k.($r ? '"' : '\'');}, str_split($ps, rand(1,4))))).',$'.$a.');@'.(!$e ? c('eval(') : '$'.$a.'[0]($'.$a.c('[4],array(),array').'("};".').'$'.$a.'[2]($'.$a.'[3]($'.$a.'[5]($'.$a.'[1]("'.strrev(d(chunk_split($r, rand(200, 250), '"."'), $r)).'"))'.(!$e ? '' : ')').')'.(!$e ? '' : '."//"').'));'));
 }
 
 m($k.($e ? ' '.$e : '').' Ok');
@@ -37,10 +37,10 @@ function x(){
 	@list($x, $c, $k, $e) = $_SERVER['argv'];
 	$p = '_packed.php'.($k == 'PHAR' ? '.phar' : '');
 	$a = ($k == 'ZIP' && class_exists('ZipArchive') ? new ZipArchive : f(0,0));
-	
+
+	(!$c ? m('php '.basename(__FILE__).' file_to_pack.php [ASCII|PHAR|ZIP] [CM|CF]') : (file_exists($c) ? @unlink($c.$p) : m('`'.$c.'` file not exists')));
 	($k != 'ASCII' && ini_get('phar.readonly') ? m('PHAR creation is disabled in "'.php_ini_loaded_file().'", need "phar.readonly = Off"') :
-	(empty($c) ? m(is_object($a) ? 'php '.basename(__FILE__).' file_to_pack.php [ASCII|PHAR|ZIP] [CM|CF]' : 'php-zip extension required!') :
-	(file_exists($c) ? @unlink($c.$p) : m('`'.$c.'` file not exists'))));
+	(!is_object($a) && $k == 'ZIP' ? m('php-zip extension required!') : ''));
 	$r = str_rot13(chunk_split(base64_encode(gzdeflate(($k == 'ASCII' ? j().'?>' : '').d(s(), t(s())).'?>'.e($c), rand(5, 9))), rand(100, 250) * 4));
 	
 	return [$p, $a, $c, $k, $e, $r];
@@ -94,7 +94,8 @@ function t($s){
 function u($s){
 	return implode('.', array_map(
 		function($k){
-				return '\''.$k.'\'';
+				$r = rand(0,1);
+				return ($r ? '"' : '\'').$k.($r ? '"' : '\'');
 		}, str_split(implode(d('%'), str_split(bin2hex(~$s), 2)), rand(1,4)))
 	);
 }
