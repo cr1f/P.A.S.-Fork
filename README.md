@@ -139,7 +139,7 @@ Features of the original **P.A.S.**:
 - New initialization logic (ini_*)
 - **opcache_invalidate** after saving the file
 - Dark color mode
-- Built-in Ace code editor (loaded on demand)
+- Built-in [Ace](https://github.com/ajaxorg/ace) code editor (loaded on demand)
 - Added file extensions in filenames
 - Option to display **ctime** (to find malicious files)
 - Option to invert terminal output
