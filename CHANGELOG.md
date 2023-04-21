@@ -37,7 +37,8 @@
 - Not compressed ZIP
 - Compressed PHAR
 - Some randomizaion improvements
-- 
+
+
 1.0
 ---
 - Work via GET requests (parameters in cookies)
