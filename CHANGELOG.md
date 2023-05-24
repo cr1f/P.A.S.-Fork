@@ -1,3 +1,11 @@
+1.3
+---
+- Load default **favicon.ico** if exists
+- Restoring minimized window position
+- File reload interval (right click)
+- Small bug fixes and improvements
+
+
 1.2
 ---
 - Option to set default tab on startup
