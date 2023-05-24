@@ -158,6 +158,9 @@ Features of the original **P.A.S.**:
 - Reading **.gz** files (not saving)
 - **Show as HTML** fix in **PHP Console**
 - Maximize file editor window on double click
+- Restoring minimized window position
+- File reload interval (right click)
+- Load default **favicon.ico** if exists
 - Removed **expect** from exec's
 - Supported PHP versions: 5 >= 5.1.2, 7, 8
   
