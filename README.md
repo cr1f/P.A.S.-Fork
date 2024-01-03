@@ -162,6 +162,10 @@ Features of the original **P.A.S.**:
 - File reload interval (right click)
 - Load default **favicon.ico** if exists
 - Removed **expect** from exec's
+- Syntax highlighting in PHP Console
+- Reduce terminal prompt if it's too long 
+- **Go!** button moved to the left
+- PDO_PGSQL DSN Fix
 - Supported PHP versions: 5 >= 5.1.2, 7, 8
   
 <br/>
