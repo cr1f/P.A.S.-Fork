@@ -1,3 +1,14 @@
+1.4
+---
+- tabFM by default
+- **(!)** Code Editor is loaded by default
+- Syntax highlighting in PHP Console
+- Reduce terminal prompt if it's too long 
+- **Go!** button moved to the left
+- PDO_PGSQL DSN Fix
+- Some improvements
+
+
 1.3
 ---
 - Load default **favicon.ico** if exists
