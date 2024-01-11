@@ -31,7 +31,7 @@ function getEncKey(){
 	$len = $GLOBALS['PRELEN'];
 	
 	foreach($_REQUEST as $k => &$v){
-		$pref = strrev(substr($k, 0, $len));
+		$pref = strrev(substr($k, 0, $len));#tabFM
 		$post = substr($k, $len, $len);
 		if($pref === $post){
 			$eKey = $v;
@@ -6126,8 +6126,9 @@ function markFiles(files) {
 }
 
 function getSlctdFiles() {
- var inps = elmById('frmFiles')['f[]'],
-  chckd = [];
+ var inps = elmById('frmFiles')['f[]'], chckd = [];
+ if(!inps.hasOwnProperty('1')) inps = [inps];
+ 
  if (inps) {
   if (inps.length > 0) {
    for (var i = 0, c = inps.length; i < c; ++i)
@@ -7246,7 +7247,6 @@ function insertCodeEditor(){
 }
 
 insertCodeEditor();
-<?=($GLOBALS['ACECONF']['DEFAULT'] ? 'aceEditorProcess();' : '')?>
 <?php } ?>
 
 function addSortToFM(){
@@ -7273,7 +7273,11 @@ function sortFilesBy(name){
 
 addSortToFM();
 
-window.location = '#<?=$GLOBALS['DEFAULT_TAB']?>'; <?=($GLOBALS['DEFAULT_TAB'] == 'tabFM' ? 'window.addEventListener("load",function(){goTo("~");})' : '')?>
+window.location = '#<?=$GLOBALS['DEFAULT_TAB']?>';
+window.addEventListener('load',function(){
+	<?=($GLOBALS['DEFAULT_TAB'] == 'tabFM' ? 'goTo("~");' : '')?>
+	<?=($GLOBALS['ACECONF']['DEFAULT'] ? 'aceEditorProcess();' : '')?>
+});
 </script>
 </html>
 <?php $out = ob_get_contents(); ob_end_clean(); ob_start('ob_gzhandler'); exit(makeOut($out));
