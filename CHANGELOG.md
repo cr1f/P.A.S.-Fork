@@ -2,11 +2,11 @@
 ---
 - Change method on password page (to avoid caching)
 - Custom environment fix
-- Global working dir option (File Manager path)
+- **Global working dir** option (File Manager path)
 - Single dir/file deletion bug fix
-- Terminal color command
-- Show as HTML iframe sandbox
-- history command match fix
+- Terminal **color** command
+- **Show as HTML** iframe sandbox
+- **history** command match fix
 - Supported PHP versions: 5 >= 5.3, 7, 8
 - AceJS v. 1.37.0
 - Small bug fixes and improvements
