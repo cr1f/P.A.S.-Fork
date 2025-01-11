@@ -8,6 +8,7 @@
 Although the author stopped supporting his product, I did not dare to release a modification with a further version number (the cobbler should stick to his last). Therefore, I offer my respect to @profexer, and I hope that he will continue his wonderful work someday.
 
 <br/>
+
 </details>
 
 A modified version of the well-known webshell - P.A.S. by Profexer ([0](https://krebsonsecurity.com/2017/08/blowing-the-whistle-on-bad-attribution/), [1](https://github.com/winstrool/pas-4.1.1b_source_code), [2](https://github.com/wordfence/grizzly/tree/master/pas-4.1.1b)). Tries to solve the problem of detecting some requests and responses by various **Web Application Firewalls** and **Intrusion Detection Systems**. In most cases, such detections entail retaliatory measures from the attacked side, which is not always permissible during penetration tests and in red teaming.
