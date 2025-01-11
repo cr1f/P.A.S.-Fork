@@ -20,9 +20,8 @@ A modified version of the well-known webshell - P.A.S. by Profexer ([0](https://
 
 <br/>
 
-Features of the original **P.A.S.**:
 <details>
-  <summary>Click to expand</summary>
+  <summary>Features of the original <b>P.A.S.</b></summary>
   
 ## **General**
 
@@ -122,52 +121,59 @@ Features of the original **P.A.S.**:
 
 * Type **cls** or **clear** or press **CTRL+L** to clear output
 </details>
-
-<br/>
-
-**P.A.S. Fork** changes:
+<details>
+  <summary><b>P.A.S. Fork</b> changes</summary>
   
-- Work via GET requests (parameters in cookies)
-- Automatic switching to POST (with cancellation)
-- Obfuscation of query keys and values
-- Obfuscation of uploaded files
-- Obfuscation of response
-- Authorization by password
-- Authorization by HTTP header (user-agent by default)
-- MySQL dump fix in PDO mode
-- Renamed "PHP 4-style constructors"
-- Removed **pcntl_exec**
-- New initialization logic (ini_*)
-- **opcache_invalidate** after saving the file
-- Dark color mode
-- Built-in [Ace](https://github.com/ajaxorg/ace) code editor (loaded on demand)
-- Added file extensions in filenames
-- Option to display **ctime** (to find malicious files)
-- Option to invert terminal output
-- Removed startup "execs"
-- FileManager JS crash fix (on rare envs)
-- Reload file bug fix
-- XHR instead IFRAME communication by default
-- The client referrer is not sent
-- Removed **X-Content-Type-Options** header in responses
-- **Clear output** in **PHP Console** checked by default
-- Option to set default tab on startup
-- Built-in [safemode](https://github.com/cr1f/safemode/) script
-- File sorting (Name, Ext, Size, etc)
-- Sort by filename by default
-- Reading **.gz** files (not saving)
-- **Show as HTML** fix in **PHP Console**
-- Maximize file editor window on double click
-- Restoring minimized window position
-- File reload interval (right click)
-- Load default **favicon.ico** if exists
-- Removed **expect** from exec's
-- Syntax highlighting in PHP Console
-- Reduce terminal prompt if it's too long 
-- **Go!** button moved to the left
-- PDO_PGSQL DSN Fix
-- Supported PHP versions: 5 >= 5.1.2, 7, 8
+  <br/>
   
+* Work via GET requests (parameters in cookies)
+* Automatic switching to POST (with cancellation)
+* Obfuscation of query keys and values
+* Obfuscation of uploaded files
+* Obfuscation of response
+* Authorization by password
+* Authorization by HTTP header (user-agent by default)
+* MySQL dump fix in PDO mode
+* Renamed "PHP 4-style constructors"
+* Removed **pcntl_exec**
+* New initialization logic (ini_*)
+* **opcache_invalidate** after saving the file
+* Dark color mode
+* Built-in [Ace](https://github.com/ajaxorg/ace) code editor (loaded on demand)
+* Added file extensions in filenames
+* Option to display **ctime** (to find malicious files)
+* Option to invert terminal output
+* Removed startup "execs"
+* FileManager JS crash fix (on rare envs)
+* Reload file bug fix
+* XHR instead IFRAME communication by default
+* The client referrer is not sent
+* Removed **X-Content-Type-Options** header in responses
+* **Clear output** in **PHP Console** checked by default
+* Option to set default tab on startup
+* Built-in [safemode](https://github.com/cr1f/safemode/) script
+* File sorting (Name, Ext, Size, etc)
+* Sort by filename by default
+* Reading **.gz** files (not saving)
+* **Show as HTML** fix in **PHP Console**
+* Maximize file editor window on double click
+* Restoring minimized window position
+* File reload interval (right click)
+* Load default **favicon.ico** if exists
+* Removed **expect** from exec's
+* Syntax highlighting in PHP Console
+* Reduce terminal prompt if it's too long 
+* **Go!** button moved to the left
+* PDO_PGSQL DSN Fix
+* Change method on password page (to avoid caching)
+* Custom environment fix
+* **Global working dir** option (File Manager path)
+* Single dir/file deletion bug fix
+* Terminal **color** command
+* **Show as HTML** iframe sandbox
+* **history** command match fix
+* Supported PHP versions: 5 >= 5.3, 7, 8
+</details>
 <br/>
 
 Screenshots
